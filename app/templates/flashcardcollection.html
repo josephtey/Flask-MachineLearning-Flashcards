@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Flashcards - {{ flashcardcollection.name }}{% endblock %}
+
+{% block page_content %}
+    <div class="page-header">
+        <h1> {{ flashcardcollection.name }} </h1>
+        <br>
+
+    </div>
+    <a href="{{ url_for('.learn', id=flashcardcollection.id, mode='normal') }}"><span
+            class="btn btn-primary btn-learn">Learn All</span></a>
+    <a href="{{ url_for('.reset_cards', id=flashcardcollection.id) }}"><span
+            class="btn btn-warning btn-learn">Reset Cards</span></a>   
+
+{% endblock %}
