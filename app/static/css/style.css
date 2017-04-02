@@ -144,3 +144,16 @@ div.flask-pagedown-preview h3 {
 #response{
     font-size:15px;
 }
+
+.learn_word_outer {
+  display: table-cell;
+  width: 1170px;
+  height: 500px;
+  vertical-align: middle;
+  text-align: center;
+}
+.learn_word_inner {
+    display: inline-block;
+    width: 1170px; 
+    height: 200px;
+}
