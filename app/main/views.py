@@ -23,8 +23,6 @@ def loadPickle(fname):
         item = pickle.load(handle)
     return item
     
-global_user_collections = loadPickle('global_user.pkl')
-
 @main.after_app_request
 def after_request(response):
     for query in get_debug_queries():
