@@ -6,6 +6,7 @@ from ..email import send_email
 from ..models.users import User
 from .forms import LoginForm, RegistrationForm, ChangePasswordForm, PasswordResetRequestForm, \
     PasswordResetForm, ChangeEmailForm
+import subprocess
 
 
 @auth.before_app_request
@@ -54,9 +55,14 @@ def register():
                     password=form.password.data)
         db.session.add(user)
         db.session.commit()
-        token = user.generate_confirmation_token()
-        send_email(user.email, 'Confirm Your Account', 'auth/email/confirm', user=user, token=token)
-        flash('A confirmation email has been sent to you by email.')
+        #token = user.generate_confirmation_token()
+        #send_email(user.email, 'Confirm Your Account', 'auth/email/confirm', user=user, token=token)
+
+        python3_command = "python import.py japanese.csv -user_id 2" 
+        process = subprocess.Popen(python3_command.split(), stdout=subprocess.PIPE)
+        output, error = process.communicate()
+
+        #flash('A confirmation email has been sent to you by email.')
         return redirect(url_for('main.index'))
     return render_template('auth/register.html', form=form)
 

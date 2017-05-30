@@ -157,3 +157,6 @@ div.flask-pagedown-preview h3 {
     width: 80%; 
     height: 200px;
 }
+#buttons {
+    margin-top: 20px;
+}

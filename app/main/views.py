@@ -13,7 +13,17 @@ import datetime
 from collections import Counter
 import math
 import copy
+import pickle
 
+#correct, wrong, exponential, intercept/bias
+WEIGHTS = [-1.74879118, -0.96294075, 5.27377647, 7.2940155867]
+
+def loadPickle(fname):
+    with open(fname, 'rb') as handle:
+        item = pickle.load(handle)
+    return item
+    
+global_user_collections = loadPickle('global_user.pkl')
 
 @main.after_app_request
 def after_request(response):
@@ -138,54 +148,58 @@ def edit_flashcard(collId, cardId):
 @main.route('/flashcardcollection/<int:id>/learn')
 @login_required
 def learn(id):
-    threshold = 0.5
     flashcardcollection = FlashcardCollection.query.get_or_404(id)
+    flashcards = flashcardcollection.flashcards.all()    
     mode = request.args.get('mode')
-    if mode == 'normal':
-        flashcards = flashcardcollection.flashcards.all()
-    else:
-        abort(404)
-    if not flashcards:
-        flash('No Cards to learn. Please reset the Cards or learn the Wrong ones if there are any.')
-        return redirect(url_for('.flashcardcollection', id=id))
-    else:
-        flashcard_generated = {}
-        for i in range(len(flashcards)):
-            if flashcards[i].history == '' or flashcards[i].last_time == 0:
-                flashcard_generated[i+1] = 0
-            else:
-                history = [int(x) for x in flashcards[i].history.split(',')]
-                correct = Counter(history)[1]
-                wrong = Counter(history)[0]
-                expo = 0.0
-                for y in range(len(history)):
-                    expo_incre = math.pow(0.8,y)
-                    if list(reversed(history))[y] == 1.0:
-                        expo += expo_incre
-                time_elapsed = int(datetime.datetime.now().strftime('%s')) - flashcards[i].last_time
-                h_power = (correct*-0.78712861)+(wrong*0.04384764)+(expo*2.87483827)+(1.5*0.27781276)+(1.5*0.33602832)+4.75948772903
-                h = math.pow(2, h_power)
-                p = math.pow(2, (-time_elapsed)/h)
-                flashcard_generated[i+1] = p
 
-        print(flashcard_generated)
-        learning_cards = copy.copy(flashcard_generated)
-        new_cards = copy.copy(flashcard_generated)
-        for i in range(len(flashcard_generated)):
-            if flashcard_generated[i+1] == 0:
-                learning_cards.pop(i+1)
-            else:
-                new_cards.pop(i+1)
-        if len(learning_cards) == 0:
+    flashcard_generated = {}
+    for i in range(len(flashcards)):
+        if flashcards[i].history == '' or flashcards[i].last_time == 0:
+            flashcard_generated[i+1] = 0
+        else:
+            history = [int(x) for x in flashcards[i].history.split(',')]
+            correct = Counter(history)[1]
+            wrong = Counter(history)[0]
+            expo = 0.0
+            for y in range(len(history)):
+                expo_incre = math.pow(0.8,y)
+                if list(reversed(history))[y] == 1.0:
+                    expo += expo_incre
+            time_elapsed = int(datetime.datetime.now().strftime('%s')) - flashcards[i].last_time
+            h_power = (correct*WEIGHTS[0])+(wrong*WEIGHTS[1])+(expo*WEIGHTS[2])+WEIGHTS[3]
+            h = math.pow(2, h_power)
+            p = math.pow(2, (-time_elapsed)/h)
+            flashcard_generated[i+1] = p
+
+    print(flashcardcollection.id)
+    print(flashcard_generated)
+    learning_cards = copy.copy(flashcard_generated)
+    new_cards = copy.copy(flashcard_generated)
+    for i in range(len(flashcard_generated)):
+        if flashcard_generated[i+1] == 0:
+            learning_cards.pop(i+1)
+        else:
+            new_cards.pop(i+1)
+    if len(learning_cards) == 0:
+        flashcard = flashcards[choice(list(new_cards.keys()))-1]
+    else:
+        index = min(learning_cards, key=learning_cards.get)
+        difference = 0.5-learning_cards[index]
+
+        #introduce a word when lowest word percentage is above 90%
+        if difference < -0.4 and len(new_cards) > 0:
             flashcard = flashcards[choice(list(new_cards.keys()))-1]
         else:
-            index = min(learning_cards, key=learning_cards.get)
-            difference = 0.5-learning_cards[index]
-            if difference < -0.3 and len(new_cards) > 0:
-                flashcard = flashcards[choice(list(new_cards.keys()))-1]
-            else:
-                flashcard = flashcards[index-1]
-    return render_template('learn.html', flashcard=flashcard, collection=flashcardcollection)
+            flashcard = flashcards[index-1]
+
+    chance = round(flashcard_generated[flashcard.id-(len(flashcards)*(flashcardcollection.id-1))],2)
+    overall = sum(flashcard_generated.values())/len(flashcards)
+    seen = 0
+    for i in range(len(flashcards)):
+        if flashcard_generated[i+1] > 0:
+            seen += 1
+
+    return render_template('learn.html', flashcard=flashcard, collection=flashcardcollection, chance=chance, overall=overall, seen=seen)
 
 
 @main.route('/flashcardcollection/<int:id>/reset-cards')
@@ -194,7 +208,11 @@ def reset_cards(id):
     coll = FlashcardCollection.query.get_or_404(id)
     for card in coll.flashcards.all():
         card.history = ''
-        card.last_time = 0
+        card.last_time = 0  
+        card.time_history = ''
+        card.timestamps = ''
+        card.durations = ''
+
     db.session.add(coll)
     db.session.commit()
     return redirect(url_for('.flashcardcollection', id=id))
@@ -209,29 +227,57 @@ def delete_card(collId, cardId):
     return redirect(url_for('.flashcardcollection', id=collId))
 
 
-@main.route('/flashcardcollection/<int:collId>/learn/<int:cardId>/wrong')
+@main.route('/flashcardcollection/<int:collId>/learn/<int:cardId>/wrong/<int:duration>')
 @login_required
-def wrong_answer(collId, cardId):    
+def wrong_answer(collId, cardId, duration):    
     flashcard = Flashcard.query.get_or_404(cardId)
+    current_time = int(datetime.datetime.now().strftime('%s'))
+
     if flashcard.history == '':
         flashcard.history = flashcard.history + '0'
     else:
         flashcard.history += ',0'
-    flashcard.last_time = int(datetime.datetime.now().strftime('%s'))
+
+    if flashcard.time_history == '':
+        flashcard.time_history += '0'
+    else:
+        flashcard.time_history += ',' + str(current_time-int(flashcard.last_time))
+
+    if flashcard.timestamps == '':
+        flashcard.timestamps += str(current_time)
+    else:
+        flashcard.timestamps += ',' + str(current_time)
+
+    print(duration)
+    flashcard.last_time = current_time
     db.session.add(flashcard)
     db.session.commit()
-    return redirect(url_for('.learn', id=collId, mode=request.args.get('mode')))
+    return redirect(url_for('.learn', id=collId, mode='normal'))
 
 
-@main.route('/flashcardcollection/<int:collId>/learn/<int:cardId>/right')
+@main.route('/flashcardcollection/<int:collId>/learn/<int:cardId>/right/<int:duration>')
 @login_required
-def right_answer(collId, cardId):
+def right_answer(collId, cardId, duration):
     flashcard = Flashcard.query.get_or_404(cardId)
+    current_time = int(datetime.datetime.now().strftime('%s'))
+
     if flashcard.history == '':
         flashcard.history = flashcard.history + '1'
     else:
         flashcard.history += ',1'
-    flashcard.last_time = int(datetime.datetime.now().strftime('%s'))
+        
+    if flashcard.time_history == '':
+        flashcard.time_history += '0'
+    else:
+        flashcard.time_history += ',' + str(current_time-int(flashcard.last_time)) 
+
+    if flashcard.timestamps == '':
+        flashcard.timestamps += str(current_time)
+    else:
+        flashcard.timestamps += ',' + str(current_time)  
+
+    print(duration)
+    flashcard.last_time = current_time
     db.session.add(flashcard)
     db.session.commit()
-    return redirect(url_for('.learn', id=collId, mode=request.args.get('mode')))
+    return redirect(url_for('.learn', id=collId, mode='normal'))

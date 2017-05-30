@@ -5,12 +5,15 @@
 {% block page_content %}
     <div class="page-header">
         <h1> {{ flashcardcollection.name }} </h1>
+        {% for category in flashcardcollection.categories %}
+            <span class="label label-primary">{{ category.name }}</span>
+        {% endfor %}
         <br>
-
     </div>
-    <a href="{{ url_for('.learn', id=flashcardcollection.id, mode='normal') }}"><span
+    <a href="{{ url_for('.learn', id=flashcardcollection.id, mode='start') }}"><span
             class="btn btn-primary btn-learn">Learn All</span></a>
     <a href="{{ url_for('.reset_cards', id=flashcardcollection.id) }}"><span
-            class="btn btn-warning btn-learn">Reset Cards</span></a>   
+            class="btn btn-warning btn-learn">Reset Cards</span></a>
+    <!-- {% include "_flashcard.html" %} -->
 
 {% endblock %}

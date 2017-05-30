@@ -13,7 +13,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(64), unique=True, index=True)
     username = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(128))
-    confirmed = db.Column(db.Boolean, default=False)
+    confirmed = db.Column(db.Boolean, default=True)
     avatar_hash = db.Column(db.String(32))
     member_since = db.Column(db.DateTime, default=datetime.utcnow)
     collections = db.relationship('FlashcardCollection', backref='user', lazy='dynamic')
