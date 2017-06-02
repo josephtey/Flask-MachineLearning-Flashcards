@@ -160,3 +160,8 @@ div.flask-pagedown-preview h3 {
 #buttons {
     margin-top: 20px;
 }
+.page-header {
+    font-weight:bold;
+    font-family:'Nitti Grotesk';
+    text-align:center;
+}

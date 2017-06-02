@@ -35,8 +35,8 @@
                 </div>
             </div>
             <div id="buttons">
-                    <a id ="wrong_link" onclick="showAnswer();"> <span class="btn btn-primary">Don't Know</span></a>
-                    <a id ="wrong_link" onclick="showAnswer();"> <span class="btn btn-primary">Submit</span></a>
+                    <a onclick="showAnswer();"> <span class="btn btn-primary">Don't Know</span></a>
+                    <a onclick="showAnswer();"> <span class="btn btn-primary">Submit</span></a>
             </div>
             <div class="learn" id="answer">
                 <div class="flashcard-body" id="answer_text">
@@ -49,12 +49,10 @@
                 
                 <div class="row choiseBtn">
                     <div class="col-xs-6 col-md-4" id="wrong_answer"> 
-                        <a id ="wrong_link" href="{{ url_for('.wrong_answer', collId=collection.id ,cardId=flashcard.id, duration=5,mode=request.args.get('mode')) }}"> <span
-                                class="btn btn-primary">Next Question</span></a>
+                        <a id ="wrong_link" href="{{ url_for('.wrong_answer', collId=collection.id,cardId=flashcard.id,duration=5,mode=request.args.get('mode')) }}" class="btn btn-primary">Next Question</a>
                     </div>
                     <div class="col-xs-6 col-md-4" id="right_answer">
-                        <a id ="right_link" href="{{ url_for('.right_answer', collId=collection.id ,cardId=flashcard.id,duration=5, mode=request.args.get('mode')) }}"><span
-                                class="btn btn-primary">Next Question</span></a>
+                        <a id ="right_link" href="{{ url_for('.right_answer', collId=collection.id,cardId=flashcard.id,duration=5, mode=request.args.get('mode')) }}" class="btn btn-primary">Next Question</a>
                     </div>
                 </div>
             </div>

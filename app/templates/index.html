@@ -4,7 +4,11 @@
 
 {% block page_content %}
     <div class="page-header">
-        <h1>Hello, {% if current_user.is_authenticated %}{{ current_user.username }}{% else %}Stranger{% endif %}</h1>
+    	<h1>Student Predictive Language Tutor</h1>
     </div>
+
+
+    {% if current_user.is_authenticated %}{% else %}<a href="auth/login"><span class="btn btn-primary">Login{% endif %}</span></a>
+
     {% include '_flashcardcollections.html' %}
 {% endblock %}
