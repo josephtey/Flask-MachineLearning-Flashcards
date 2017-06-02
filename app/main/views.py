@@ -190,7 +190,7 @@ def learn(id):
         else:
             flashcard = flashcards[index-1]
 
-    chance = round(flashcard_generated[flashcard.id-(len(flashcards)*(flashcardcollection.id-1))],2)
+    chance = round(flashcard_generated[flashcard.id-(len(flashcards)*(flashcardcollection.id-1))],2)*100
     overall = sum(flashcard_generated.values())/len(flashcards)
     seen = 0
     for i in range(len(flashcards)):
