@@ -11,7 +11,7 @@
                 <div class="flashcard-body">
                 <div class="stopwatch" style="font-size:15px; font-weight:lighter; color:grey">
                     <span id="my-stopwatch"></span> seconds
-                </div> 
+                </div>
 
                     <span style="font-size:20px; font-weight:lighter; color:grey">
                         {% if flashcard.history == '' %}
@@ -19,7 +19,7 @@
                         {% else %}
                             <p>There is a {{chance}}% chance you will remember this</p>
                         {% endif %}
-                        
+
                     </span>
                     {% if flashcard.question_html %}
                         <p>{{ flashcard.question_html | safe }}</p>
@@ -46,9 +46,9 @@
                         <p>{{ flashcard.answer }}</p>
                     {% endif %}
                 </div>
-                
+
                 <div class="row choiseBtn">
-                    <div class="col-xs-6 col-md-4" id="wrong_answer"> 
+                    <div class="col-xs-6 col-md-4" id="wrong_answer">
                         <a id ="wrong_link" href="{{ url_for('.wrong_answer', collId=collection.id,cardId=flashcard.id,duration=5,mode=request.args.get('mode')) }}" class="btn btn-primary">Next Question</a>
                     </div>
                     <div class="col-xs-6 col-md-4" id="right_answer">
@@ -59,20 +59,20 @@
         </div>
     </div>
 
-<p style="font-size: 20px; font-family: helvetica; text-align: center">Learning Progress - {{seen}}/35</p>
+<p style="font-size: 20px; font-family: helvetica; text-align: center">Learning Progress - {{seen}}/{{overall_len}}</p>
 <div class="progress">
-  <div class="progress-bar" role="progressbar" aria-valuenow="{{overall*100}}" aria-valuemin="0" aria-valuemax="100" style="width:{{overall*100}}%">
+  <div class="progress-bar" role="progressbar" aria-valuenow="{{(overall_sum/overall_len)*100}}" aria-valuemin="0" aria-valuemax="100" style="width:{{(overall_sum/overall_len)*100}}%">
   </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
     {{ super() }}
-    
+
 
     <script src="{{ url_for('static', filename='js/answer.js') }}"></script>
     <!-- <script src='https://code.responsivevoice.org/responsivevoice.js'></script> -->
-    
+
     <script type="text/javascript">
         // var obj = { {{flashcard.answer}} : 'John' };
         // for(key in obj)
@@ -99,7 +99,7 @@
             Update();
             localStorage.setItem('started', true)
         }
-        
+
         function Update() {
             finishTime = localStorage.getItem('myTime');
             var timeLeft = (finishTime - new Date());

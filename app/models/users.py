@@ -16,6 +16,8 @@ class User(UserMixin, db.Model):
     confirmed = db.Column(db.Boolean, default=True)
     avatar_hash = db.Column(db.String(32))
     member_since = db.Column(db.DateTime, default=datetime.utcnow)
+    total_reps = db.Column(db.Integer, default=0)
+    last_index = db.Column(db.Integer, default=0)
     collections = db.relationship('FlashcardCollection', backref='user', lazy='dynamic')
 
     @property
