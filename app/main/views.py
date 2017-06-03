@@ -261,6 +261,7 @@ def learn(id):
 @login_required
 def reset_cards(id):
     coll = FlashcardCollection.query.get_or_404(id)
+    current_user.total_reps = 0
     for card in coll.flashcards.all():
         card.history = ''
         card.last_time = 0
