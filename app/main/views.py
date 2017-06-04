@@ -256,18 +256,40 @@ def learn(id):
 
     return render_template('learn.html', flashcard=flashcard, collection=flashcardcollection, chance=chance, overall_sum=overall_sum, overall_len=overall_len, seen=seen)
 
+@main.route('/flashcardcollection/<int:id>/test')
+@login_required
+def test(id):
+    #important vars
+    flashcardcollection = FlashcardCollection.query.get_or_404(id)
+    flashcards = flashcardcollection.flashcards.all()
+    mode = request.args.get('mode')
+    flashcard = flashcards[0]
+
+    if current_user.last_index == len(flashcards)-1:
+        print("done")
+    elif current_user.last_index == 0 and flashcard.test_answer == None:
+        flashcard = flashcards[0]
+    else:
+        flashcard = flashcards[current_user.last_index+1]
+
+    current_user.last_index = flashcards.index(flashcard)
+
+    return render_template('test.html', flashcard=flashcard, collection=flashcardcollection)
 
 @main.route('/flashcardcollection/<int:id>/reset-cards')
 @login_required
 def reset_cards(id):
     coll = FlashcardCollection.query.get_or_404(id)
     current_user.total_reps = 0
+    current_user.last_index = 0
+
     for card in coll.flashcards.all():
         card.history = ''
         card.last_time = 0
         card.time_history = ''
         card.timestamps = ''
         card.durations = ''
+        card.test_answer = None
 
     db.session.add(coll)
     db.session.commit()
@@ -310,7 +332,6 @@ def wrong_answer(collId, cardId, duration):
     db.session.commit()
     return redirect(url_for('.learn', id=collId, mode='normal'))
 
-
 @main.route('/flashcardcollection/<int:collId>/learn/<int:cardId>/right/<int:duration>')
 @login_required
 def right_answer(collId, cardId, duration):
@@ -337,3 +358,25 @@ def right_answer(collId, cardId, duration):
     db.session.add(flashcard)
     db.session.commit()
     return redirect(url_for('.learn', id=collId, mode='normal'))
+
+@main.route('/flashcardcollection/<int:collId>/test/<int:cardId>/wrong/<int:duration>')
+@login_required
+def test_wrong(collId, cardId, duration):
+    flashcard = Flashcard.query.get_or_404(cardId)
+
+    flashcard.test_answer = 0
+
+    db.session.add(flashcard)
+    db.session.commit()
+    return redirect(url_for('.test', id=collId, mode='normal'))
+
+@main.route('/flashcardcollection/<int:collId>/test/<int:cardId>/right/<int:duration>')
+@login_required
+def test_right(collId, cardId, duration):
+    flashcard = Flashcard.query.get_or_404(cardId)
+
+    flashcard.test_answer = 1
+
+    db.session.add(flashcard)
+    db.session.commit()
+    return redirect(url_for('.test', id=collId, mode='normal'))

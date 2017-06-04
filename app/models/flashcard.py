@@ -16,6 +16,7 @@ class Flashcard(db.Model):
     timestamps = db.Column(db.Text, default='')
     durations = db.Column(db.Text, default='')
     scheduler = db.Column(db.Integer, default = 1)
+    test_answer = db.Column(db.Integer, default = None)
     collection_id = db.Column(db.Integer, db.ForeignKey('flashcardcollection.id'))
 
     @staticmethod

@@ -12,6 +12,8 @@
     </div>
     <a href="{{ url_for('.learn', id=flashcardcollection.id, mode='start') }}"><span
             class="btn btn-primary btn-learn">Learn All</span></a>
+    <a href="{{ url_for('.test', id=flashcardcollection.id, mode='normal') }}"><span
+            class="btn btn-primary btn-learn">Test</span></a>
     <a href="{{ url_for('.reset_cards', id=flashcardcollection.id) }}"><span
             class="btn btn-warning btn-learn">Reset Cards</span></a>
     <!-- {% include "_flashcard.html" %} -->

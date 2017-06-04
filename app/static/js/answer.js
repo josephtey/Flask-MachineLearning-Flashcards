@@ -2,23 +2,23 @@
  * Created by raeste on 09.03.17.
  */
 function ld(a, b) {
-    if(a.length == 0) return b.length; 
-    if(b.length == 0) return a.length; 
-  
+    if(a.length == 0) return b.length;
+    if(b.length == 0) return a.length;
+
     var matrix = [];
-  
+
     // increment along the first column of each row
     var i;
     for(i = 0; i <= b.length; i++){
       matrix[i] = [i];
     }
-  
+
     // increment each column in the first row
     var j;
     for(j = 0; j <= a.length; j++){
       matrix[0][j] = j;
     }
-  
+
     // Fill in the rest of the matrix
     for(i = 1; i <= b.length; i++){
       for(j = 1; j <= a.length; j++){
@@ -31,7 +31,7 @@ function ld(a, b) {
         }
       }
     }
-  
+
     return matrix[b.length][a.length];
   }
 
@@ -52,7 +52,7 @@ function showAnswer() {
     user_response = response.value.replace(/\s/g,'');
 
     if (answer.style.display != 'block'){
-      if (ld(ans.toUpperCase(), user_response.toUpperCase()) < 2) {
+      if (ld(ans.toUpperCase(), user_response.toUpperCase()) <= 2) {
           right_answer.style.display = 'block';
           answer_txt.className += ' green';
           localStorage.setItem('outcome', true)
@@ -70,7 +70,7 @@ function showAnswer() {
         } else {
             console.log('wrong')
             wrong_link.click();
-            
+
         }
     }
     answer.style.display = 'block';
@@ -106,7 +106,7 @@ var Stopwatch = function(elem, options) {
   options = options || {};
   options.delay = options.delay || 1;
 
-  // append elements     
+  // append elements
   elem.appendChild(timer);
 
   // initialize
