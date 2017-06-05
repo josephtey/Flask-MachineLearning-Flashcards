@@ -267,7 +267,7 @@ def test(id):
 
     if current_user.last_index == len(flashcards)-1:
         print("done")
-    elif current_user.last_index == 0 and flashcard.test_answer == None:
+    elif current_user.last_index == 0 and flashcard.test_answer == -1:
         flashcard = flashcards[0]
     else:
         flashcard = flashcards[current_user.last_index+1]
