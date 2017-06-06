@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Flashcard - Learning Collection {{ name }}{% endblock %}
+
+{% block page_content %}
+<p>Pre-Testing Session</p>
+    <div class="learn_word_outer">
+        <div class="learn_word_inner">
+            <div>
+                <div class="flashcard-body">
+
+                    {% if flashcard.question_html %}
+                        <p>{{ flashcard.question_html | safe }}</p>
+                    {% else %}
+                        <p>{{ flashcard.question }}</p>
+                    {% endif %}
+                </div>
+
+            </div>
+            <div class="flashcard-body" id="answer_text">
+                {% if flashcard.answer_html %}
+                    <p>{{ flashcard.answer_html | safe }}</p>
+                {% else %}
+                    <p>{{ flashcard.answer }}</p>
+                {% endif %}
+            </div>
+
+            <a id ="next" href="{{ url_for('.next', collId=collection.id,cardId=flashcard.id,mode=request.args.get('mode')) }}" class="btn btn-primary">Next Question</a>
+
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+
+
+    <script src="{{ url_for('static', filename='js/answer.js') }}"></script>
+    <!-- <script src='https://code.responsivevoice.org/responsivevoice.js'></script> -->
+
+    <script type="text/javascript">
+        // var obj = { {{flashcard.answer}} : 'John' };
+        // for(key in obj)
+        //     var answer = key
+        // console.log(answer)
+        // responsiveVoice.speak(answer, "Chinese Female", {rate: 0.7});
+
+        var elem = document.getElementById("my-stopwatch");
+        var timer = new Stopwatch(elem, {delay: 10});
+    </script>
+
+{% endblock %}

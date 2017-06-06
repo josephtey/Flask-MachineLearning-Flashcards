@@ -20,7 +20,7 @@ import pickle
 WEIGHTS = [-1.74879118, -0.96294075, 5.27377647, 7.2940155867]
 
 #mins
-SESSION_LENGTH = 16
+SESSION_LENGTH = 30
 
 def loadPickle(fname):
     with open(fname, 'rb') as handle:
@@ -166,7 +166,7 @@ def learn(id):
         scheduler = 1
     elif current_user.total_reps > repetitions_per_scheduler and current_user.total_reps <= (2*repetitions_per_scheduler):
         scheduler = 2
-    elif current_user.total_reps > (2*repetitions_per_scheduler) and all_flashcards[i].scheduler == 3:
+    elif current_user.total_reps > (2*repetitions_per_scheduler):
         scheduler = 3
 
     #get words for specific scheduler
@@ -276,6 +276,26 @@ def test(id):
 
     return render_template('test.html', flashcard=flashcard, collection=flashcardcollection)
 
+@main.route('/flashcardcollection/<int:id>/pretest')
+@login_required
+def pretest(id):
+    #important vars
+    flashcardcollection = FlashcardCollection.query.get_or_404(id)
+    flashcards = flashcardcollection.flashcards.all()
+    mode = request.args.get('mode')
+    flashcard = flashcards[0]
+
+    if current_user.last_index == len(flashcards)-1:
+        return redirect(url_for('.learn', id=flashcardcollection.id, mode='start'))
+    elif current_user.last_index == 0 and flashcard.pre_answer == -1 or flashcard.pre_answer == None:
+        flashcard = flashcards[0]
+    else:
+        flashcard = flashcards[current_user.last_index+1]
+
+    current_user.last_index = flashcards.index(flashcard)
+
+    return render_template('pretest.html', flashcard=flashcard, collection=flashcardcollection)
+
 @main.route('/flashcardcollection/<int:id>/reset-cards')
 @login_required
 def reset_cards(id):
@@ -289,7 +309,8 @@ def reset_cards(id):
         card.time_history = ''
         card.timestamps = ''
         card.durations = ''
-        card.test_answer = None
+        card.test_answer = -1
+        card.pre_answer = -1
 
     db.session.add(coll)
     db.session.commit()
@@ -380,3 +401,14 @@ def test_right(collId, cardId, duration):
     db.session.add(flashcard)
     db.session.commit()
     return redirect(url_for('.test', id=collId, mode='normal'))
+
+@main.route('/flashcardcollection/<int:collId>/test/<int:cardId>/next')
+@login_required
+def next(collId, cardId):
+    flashcard = Flashcard.query.get_or_404(cardId)
+
+    flashcard.pre_answer = 1
+
+    db.session.add(flashcard)
+    db.session.commit()
+    return redirect(url_for('.pretest', id=collId, mode='normal'))
