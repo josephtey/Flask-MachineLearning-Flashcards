@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Informed Consent{% endblock %}
+
+{% block page_content %}
+
+    <h1>Statement of Informed Consent</h1> <br/>
+    <p style="font-size:20px !important">
+      My name is Joseph Tey; I am currently a student in Year 10, undertaking a VCE subject known as Extended Investigation. My research investigates computer-assisted tools to enhance student learning.
+      <br><br>
+      Participation in this experiment is completely voluntary and anonymous. Care has been taken to ensure the protection of your privacy and anonymity. The experiment should take no more than 25 minutes.
+      <br><br>
+      By clicking 'proceed', you agree to the following terms:<br>
+      <ol style="font-size:20px">
+        <li>The use of your responses for analysis and collection only by the conductor of this study; Joseph Tey.</li>
+        <li>Sharing of anonymous results, through presentations, between assessment authorities, such as VCAA, peers and teachers.</li>
+      </ol>
+      <br>
+
+      <p style="font-size:20px">If you wish to ask any questions, please contact Joseph Tey via email: S1032319@haileybury.vic.edu.au</p>
+    </p>
+    <a class="btn btn-primary" href="{{ url_for('.learn', id=id, mode='normal') }}">Proceed</a>
+
+{% endblock %}

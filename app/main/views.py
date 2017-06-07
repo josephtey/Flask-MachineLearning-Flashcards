@@ -225,7 +225,10 @@ def learn(id):
                             last_streak += 1
                         else:
                             break
-                    h = hclip(math.pow(2, 10+last_streak))
+                    try:
+                        h = hclip(math.pow(2, 10+last_streak))
+                    except OverflowError:
+                        h = 256800
 
                 p = pclip(math.pow(2, (-time_elapsed)/h))
             else:
@@ -324,6 +327,11 @@ def pretest(id):
 @login_required
 def finished():
     return render_template('finished.html')
+
+@main.route('/flashcardcollection/<int:id>/consent')
+@login_required
+def consent(id):
+    return render_template('consent.html', id=id)
 
 @main.route('/flashcardcollection/<int:id>/reset-cards')
 @login_required
