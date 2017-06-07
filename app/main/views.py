@@ -150,6 +150,11 @@ def edit_flashcard(collId, cardId):
 @main.route('/flashcardcollection/<int:id>/learn')
 @login_required
 def learn(id):
+    def pclip(p):
+        return min(max(p, 0.1), .9999)
+    def hclip(h):
+        return min(max(h, 1), 2000000)
+
     #important vars
     flashcardcollection = FlashcardCollection.query.get_or_404(id)
     all_flashcards = flashcardcollection.flashcards.all()
@@ -166,8 +171,11 @@ def learn(id):
         scheduler = 1
     elif current_user.total_reps > repetitions_per_scheduler and current_user.total_reps <= (2*repetitions_per_scheduler):
         scheduler = 2
-    elif current_user.total_reps > (2*repetitions_per_scheduler):
+    elif current_user.total_reps > (2*repetitions_per_scheduler) and current_user.total_reps <= (3*repetitions_per_scheduler):
         scheduler = 3
+    else:
+        return redirect(url_for('.finished'))
+
 
     #get words for specific scheduler
     flashcards = []
@@ -184,8 +192,10 @@ def learn(id):
     print('total reps: ' + str(current_user.total_reps))
 
     flashcard_generated = {}
+    print(flashcards)
     for i in range(len(flashcards)):
         if flashcards[i].history == '' or flashcards[i].last_time == 0:
+            #print(str(i+1))
             flashcard_generated[i+1] = 0
         else:
             #generic features
@@ -202,11 +212,22 @@ def learn(id):
                     if list(reversed(history))[y] == 1.0:
                         expo += expo_incre
                 h_power = (correct*WEIGHTS[0])+(wrong*WEIGHTS[1])+(expo*WEIGHTS[2])+WEIGHTS[3]
-                h = math.pow(2, h_power)
-                p = math.pow(2, (-time_elapsed)/h)
+                h = hclip(math.pow(2, h_power))
+                p = pclip(math.pow(2, (-time_elapsed)/h))
+
             elif scheduler == 2:
-                h = math.pow(2, correct*1000)
-                p = math.pow(2, (-time_elapsed)/h)
+                last_streak = 0
+                if history[-1] == 0:
+                    h = 5
+                else:
+                    for x in range(1,len(history)):
+                        if history[-x] == 1:
+                            last_streak += 1
+                        else:
+                            break
+                    h = hclip(math.pow(2, 10+last_streak))
+
+                p = pclip(math.pow(2, (-time_elapsed)/h))
             else:
                 p = 0.5
 
@@ -246,6 +267,8 @@ def learn(id):
 
         current_user.last_index = flashcards.index(flashcard)
 
+        print(flashcard.question)
+
     chance = round(round(flashcard_generated[flashcards.index(flashcard)+1],2)*100)
     overall_sum = sum(flashcard_generated.values())
     overall_len = len(flashcard_generated.values())
@@ -254,7 +277,8 @@ def learn(id):
         if flashcard_generated[i+1] > 0:
             seen += 1
 
-    return render_template('learn.html', flashcard=flashcard, collection=flashcardcollection, chance=chance, overall_sum=overall_sum, overall_len=overall_len, seen=seen)
+    time_left = round(SESSION_LENGTH - current_user.total_reps*(1/6),2)
+    return render_template('learn.html', flashcard=flashcard, collection=flashcardcollection, chance=chance, overall_sum=overall_sum, overall_len=overall_len, seen=seen, time_left=time_left)
 
 @main.route('/flashcardcollection/<int:id>/test')
 @login_required
@@ -295,6 +319,11 @@ def pretest(id):
     current_user.last_index = flashcards.index(flashcard)
 
     return render_template('pretest.html', flashcard=flashcard, collection=flashcardcollection)
+
+@main.route('/flashcardcollection/finished')
+@login_required
+def finished():
+    return render_template('finished.html')
 
 @main.route('/flashcardcollection/<int:id>/reset-cards')
 @login_required
