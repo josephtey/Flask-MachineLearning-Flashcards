@@ -15,6 +15,8 @@ from collections import Counter
 import math
 import copy
 import pickle
+import sqlite3
+import operator
 
 #correct, wrong, exponential, intercept/bias
 WEIGHTS = [-1.74879118, -0.96294075, 5.27377647, 7.2940155867]
@@ -160,6 +162,20 @@ def learn(id):
     all_flashcards = flashcardcollection.flashcards.all()
     mode = request.args.get('mode')
 
+    sqlite_file = 'data-dev.sqlite'
+    user_ids = []
+    total_reps = []
+
+    conn = sqlite3.connect(sqlite_file)
+    c = conn.cursor()
+
+    for row in c.execute("SELECT rowid, * FROM users ORDER BY id"):
+        user_ids.append(row[0])
+        total_reps.append(row[-2])
+
+    pre_dict = dict(zip(user_ids, total_reps))
+    leaderboards = dict(reversed(sorted(pre_dict.items(), key=operator.itemgetter(1))))
+
     #temp vars
     total_repetitions = SESSION_LENGTH*6
     repetitions_per_scheduler = total_repetitions/3
@@ -281,7 +297,9 @@ def learn(id):
             seen += 1
 
     time_left = round(SESSION_LENGTH - current_user.total_reps*(1/6),2)
-    return render_template('learn.html', flashcard=flashcard, collection=flashcardcollection, chance=chance, overall_sum=overall_sum, overall_len=overall_len, seen=seen, time_left=time_left)
+
+
+    return render_template('learn.html', flashcard=flashcard, collection=flashcardcollection, chance=chance, overall_sum=overall_sum, overall_len=overall_len, seen=seen, time_left=time_left, leaderboards=leaderboards)
 
 @main.route('/flashcardcollection/<int:id>/test')
 @login_required

@@ -4,58 +4,67 @@
 
 {% block page_content %}
     <p style="font-size: 20px; font-family: helvetica; text-align: center">{{time_left}} minutes<p>
-    <div class="learn_word_outer">
-        <div class="learn_word_inner">
-            <div>
-                <div class="flashcard-body">
-                <div class="stopwatch" style="font-size:15px; font-weight:lighter; color:grey">
-                    <span id="my-stopwatch"></span> seconds
-                </div>
-
-                    <span style="font-size:20px; font-weight:lighter; color:grey">
-                        {% if flashcard.history == '' %}
-                            <p>This is a new word.</p>
-                        {% else %}
-                            <p>There is a {{chance}}% chance you will remember this</p>
-                        {% endif %}
-
-                    </span>
-                    {% if flashcard.question_html %}
-                        <p>{{ flashcard.question_html | safe }}</p>
-                    {% else %}
-                        <p>{{ flashcard.question }}</p>
-                    {% endif %}
-                </div>
-
-            </div>
-            <div class="row">
-                <div class="col-md-8 col-md-offset-2">
-                    <input type="text" class="form-control" id="response" onkeydown="detect(event)"  autofocus="autofocus" >
-                </div>
-            </div>
-            <div id="buttons">
-                    <a onclick="showAnswer();"> <span class="btn btn-primary">Don't Know</span></a>
-                    <a onclick="showAnswer();"> <span class="btn btn-primary">Submit</span></a>
-            </div>
-            <div class="learn" id="answer">
-                <div class="flashcard-body" id="answer_text">
-                    {% if flashcard.answer_html %}
-                        <p>{{ flashcard.answer_html | safe }}</p>
-                    {% else %}
-                        <p>{{ flashcard.answer }}</p>
-                    {% endif %}
-                </div>
-
-                <div class="row choiseBtn">
-                    <div class="col-xs-6 col-md-4" id="wrong_answer">
-                        <a id ="wrong_link" href="{{ url_for('.wrong_answer', collId=collection.id,cardId=flashcard.id,duration=5,mode=request.args.get('mode')) }}" class="btn btn-primary">Next Question</a>
-                    </div>
-                    <div class="col-xs-6 col-md-4" id="right_answer">
-                        <a id ="right_link" href="{{ url_for('.right_answer', collId=collection.id,cardId=flashcard.id,duration=5, mode=request.args.get('mode')) }}" class="btn btn-primary">Next Question</a>
-                    </div>
-                </div>
-            </div>
+      <div class="panel panel-default" style="float:left; position:absolute">
+        <div class="panel-body">
+          <b>Leaderboards</b> <br></br>
+          <ol style="text-align: left; margin: 0; padding-left:19px">
+            {% for key in leaderboards.keys() %}
+              <li><b>User {{key}}</b> - {{leaderboards[key]}}</li>
+            {% endfor %}
+          </ol>
         </div>
+      </div>
+    <div class="learn_word_outer">
+          <div class="learn_word_inner">
+              <div>
+                <div class="flashcard-body">
+                  <div class="stopwatch" style="font-size:15px; font-weight:lighter; color:grey">
+                      <span id="my-stopwatch"></span> seconds
+                  </div>
+                  <span style="font-size:20px; font-weight:lighter; color:grey">
+                      {% if flashcard.history == '' %}
+                          <p>This is a new word.</p>
+                      {% else %}
+                          <p>There is a {{chance}}% chance you will remember this</p>
+                      {% endif %}
+
+                  </span>
+                  {% if flashcard.question_html %}
+                      <p>{{ flashcard.question_html | safe }}</p>
+                  {% else %}
+                      <p>{{ flashcard.question }}</p>
+                  {% endif %}
+                </div>
+
+              </div>
+              <div class="row">
+                  <div class="col-md-8 col-md-offset-2">
+                      <input type="text" class="form-control" id="response" onkeydown="detect(event)"  autofocus="autofocus" >
+                  </div>
+              </div>
+              <div id="buttons">
+                      <a onclick="showAnswer();"> <span class="btn btn-primary">Don't Know</span></a>
+                      <a onclick="showAnswer();"> <span class="btn btn-primary">Submit</span></a>
+              </div>
+              <div class="learn" id="answer">
+                  <div class="flashcard-body" id="answer_text">
+                      {% if flashcard.answer_html %}
+                          <p>{{ flashcard.answer_html | safe }}</p>
+                      {% else %}
+                          <p>{{ flashcard.answer }}</p>
+                      {% endif %}
+                  </div>
+
+                  <div class="row choiseBtn">
+                      <div class="col-xs-6 col-md-4" id="wrong_answer">
+                          <a id ="wrong_link" href="{{ url_for('.wrong_answer', collId=collection.id,cardId=flashcard.id,duration=5,mode=request.args.get('mode')) }}" class="btn btn-primary">Next Question</a>
+                      </div>
+                      <div class="col-xs-6 col-md-4" id="right_answer">
+                          <a id ="right_link" href="{{ url_for('.right_answer', collId=collection.id,cardId=flashcard.id,duration=5, mode=request.args.get('mode')) }}" class="btn btn-primary">Next Question</a>
+                      </div>
+                  </div>
+              </div>
+          </div>
     </div>
 
 <p style="font-size: 20px; font-family: helvetica; text-align: center">Learning Progress - {{seen}}/{{overall_len}}</p>
