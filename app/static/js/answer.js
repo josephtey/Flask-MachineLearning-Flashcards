@@ -53,28 +53,39 @@ function showAnswer() {
 
     if (answer.style.display != 'block'){
       if (ld(ans.toUpperCase(), user_response.toUpperCase()) <= 2) {
-          right_answer.style.display = 'block';
+          // right_answer.style.display = 'block';
           answer_txt.className += ' green';
           localStorage.setItem('outcome', true)
       } else {
-          wrong_answer.style.display = 'block';
+          // wrong_answer.style.display = 'block';
           answer_txt.className += ' red';
           localStorage.setItem('outcome', false)
       }
     }
 
-    if (answer.style.display == 'block') {
-        if (localStorage.getItem('outcome') == 'true') {
-            console.log('correct');
-            right_link.click();
-        } else {
-            console.log('wrong')
-            wrong_link.click();
+    // if (answer.style.display == 'block') {
+    //     if (localStorage.getItem('outcome') == 'true') {
+    //         console.log('correct');
+    //         right_link.click();
+    //     } else {
+    //         console.log('wrong')
+    //         wrong_link.click();
+    //
+    //     }
+    // }
+    setTimeout(function(){
+      if (localStorage.getItem('outcome') == 'true') {
+          console.log('correct');
+          right_link.click();
+      } else {
+          console.log('wrong')
+          wrong_link.click();
 
-        }
-    }
+      }
+    }, 3000);
     answer.style.display = 'block';
     buttons.style.display = 'none'
+
 
 }
 function stopTimer(){

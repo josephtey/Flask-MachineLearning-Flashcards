@@ -18,6 +18,8 @@ class Flashcard(db.Model):
     scheduler = db.Column(db.Integer, default = 1)
     test_answer = db.Column(db.Integer, default = -1)
     pre_answer = db.Column(db.Integer, default = -1)
+    last_strength = db.Column(db.Integer, default = 0)
+    introduced_history = db.Column(db.Text, default = '')
     collection_id = db.Column(db.Integer, db.ForeignKey('flashcardcollection.id'))
 
     @staticmethod

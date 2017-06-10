@@ -19,7 +19,8 @@ import sqlite3
 import operator
 
 #correct, wrong, exponential, intercept/bias
-WEIGHTS = [-1.74879118, -0.96294075, 5.27377647, 7.2940155867]
+WEIGHTS = [-1.31889574, -0.46632819,  3.63402041, 6.61932582385]
+
 
 #mins
 SESSION_LENGTH = 30
@@ -171,7 +172,7 @@ def learn(id):
 
     for row in c.execute("SELECT rowid, * FROM users ORDER BY id"):
         user_ids.append(row[3])
-        total_reps.append(row[-2])
+        total_reps.append(row[-1])
 
     pre_dict = dict(zip(user_ids, total_reps))
     leaderboards = dict(reversed(sorted(pre_dict.items(), key=operator.itemgetter(1))))
@@ -219,6 +220,7 @@ def learn(id):
             correct = Counter(history)[1]
             wrong = Counter(history)[0]
             time_elapsed = int(datetime.datetime.now().strftime('%s')) - flashcards[i].last_time
+            last_strength = flashcards[i].last_strength
 
             #machine learning features
             if scheduler == 1:
@@ -232,19 +234,18 @@ def learn(id):
                 p = pclip(math.pow(2, (-time_elapsed)/h))
 
             elif scheduler == 2:
-                last_streak = 0
-                if history[-1] == 0:
-                    h = 5
-                else:
-                    for x in range(1,len(history)):
-                        if history[-x] == 1:
-                            last_streak += 1
-                        else:
-                            break
-                    try:
-                        h = hclip(math.pow(2, 10+last_streak))
-                    except OverflowError:
-                        h = 256800
+                last_answer = history[-1]
+                last_int = last_strength + 7
+
+                if last_answer == 1:
+                    last_int += 1
+                elif last_answer == 0:
+                    last_int -= 1
+
+                try:
+                    h = hclip(math.pow(2, last_int))
+                except OverflowError:
+                    h = 256800
 
                 p = pclip(math.pow(2, (-time_elapsed)/h))
             else:
@@ -297,7 +298,6 @@ def learn(id):
             seen += 1
 
     time_left = round(SESSION_LENGTH - current_user.total_reps*(1/6),2)
-
 
     return render_template('learn.html', flashcard=flashcard, collection=flashcardcollection, chance=chance, overall_sum=overall_sum, overall_len=overall_len, seen=seen, time_left=time_left, leaderboards=leaderboards)
 
@@ -366,6 +366,8 @@ def reset_cards(id):
         card.durations = ''
         card.test_answer = -1
         card.pre_answer = -1
+        card.last_strength = 0
+        card.introduced_history = ''
 
     db.session.add(coll)
     db.session.commit()
@@ -388,6 +390,12 @@ def wrong_answer(collId, cardId, duration):
     current_time = int(datetime.datetime.now().strftime('%s'))
 
     if flashcard.history == '':
+        if flashcard.introduced_history == '':
+            flashcard.introduced_history += str(current_time)
+        else:
+            flashcard.introduced_history += ',' + str(current_time)
+
+    if flashcard.history == '':
         flashcard.history = flashcard.history + '0'
     else:
         flashcard.history += ',0'
@@ -402,7 +410,10 @@ def wrong_answer(collId, cardId, duration):
     else:
         flashcard.timestamps += ',' + str(current_time)
 
+    if flashcard.last_strength != 0:
+        flashcard.last_strength -= 1
     current_user.total_reps += 1
+    current_user.score += 1
     flashcard.last_time = current_time
     db.session.add(flashcard)
     db.session.commit()
@@ -413,6 +424,12 @@ def wrong_answer(collId, cardId, duration):
 def right_answer(collId, cardId, duration):
     flashcard = Flashcard.query.get_or_404(cardId)
     current_time = int(datetime.datetime.now().strftime('%s'))
+
+    if flashcard.history == '':
+        if flashcard.introduced_history == '':
+            flashcard.introduced_history += str(current_time)
+        else:
+            flashcard.introduced_history += ',' + str(current_time)
 
     if flashcard.history == '':
         flashcard.history = flashcard.history + '1'
@@ -429,7 +446,9 @@ def right_answer(collId, cardId, duration):
     else:
         flashcard.timestamps += ',' + str(current_time)
 
+    flashcard.last_strength += 1
     current_user.total_reps += 1
+    current_user.score += 3
     flashcard.last_time = current_time
     db.session.add(flashcard)
     db.session.commit()

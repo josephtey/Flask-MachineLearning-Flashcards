@@ -91,32 +91,6 @@
         var elem = document.getElementById("my-stopwatch");
         var timer = new Stopwatch(elem, {delay: 10});
 
-        var start = document.getElementById("start");
-        var dis = document.getElementById("display");
-        var finishTime;
-        var timerLength = 1800;
-        var timeoutID;
-        dis.innerHTML = timerLength;
-        if(localStorage.getItem('myTime')){
-            Update();
-        }
-
-        if (localStorage.getItem('started') == null | localStorage.getItem('started') == "null"){
-            localStorage.setItem('myTime', ((new Date()).getTime() + timerLength * 1000));
-            if (timeoutID != undefined) window.clearTimeout(timeoutID);
-            Update();
-            localStorage.setItem('started', true)
-        }
-
-        function Update() {
-            finishTime = localStorage.getItem('myTime');
-            var timeLeft = (finishTime - new Date());
-            dis.innerHTML = Math.max((timeLeft/1000/60).toFixed(2),0) + " minutes";
-            timeoutID = window.setTimeout(Update, 100);
-            if (timeLeft <= 0) {
-                localStorage.setItem('started', null)
-            }
-        }
     </script>
 
 {% endblock %}
