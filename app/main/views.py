@@ -150,9 +150,9 @@ def edit_flashcard(collId, cardId):
     return render_template('edit_flashcard.html', form=form, flashcard=flashcard)
 
 
-@main.route('/flashcardcollection/<int:id>/learn')
+@main.route('/flashcardcollection/<int:id>/learn/<int:current>')
 @login_required
-def learn(id):
+def learn(id, current):
     def pclip(p):
         return min(max(p, 0.1), .9999)
     def hclip(h):
@@ -225,17 +225,21 @@ def learn(id):
             #machine learning features
             if scheduler == 1:
                 expo = 0.0
-                for y in range(len(history)):
-                    expo_incre = math.pow(0.8,y)
-                    if list(reversed(history))[y] == 1.0:
-                        expo += expo_incre
+
+                if (len(history) > 1):
+                    for y in range(len(history)):
+                        expo_incre = math.pow(0.8,y)
+                        if list(reversed(history))[y] == 1.0:
+                            expo += expo_incre
+                else:
+                    expo = 0.0
                 h_power = (correct*WEIGHTS[0])+(wrong*WEIGHTS[1])+(expo*WEIGHTS[2])+WEIGHTS[3]
                 h = hclip(math.pow(2, h_power))
                 p = pclip(math.pow(2, (-time_elapsed)/h))
 
             elif scheduler == 2:
                 last_answer = history[-1]
-                last_int = last_strength + 7
+                last_int = last_strength + 8
 
                 if last_answer == 1:
                     last_int += 1
@@ -263,31 +267,33 @@ def learn(id):
             learning_cards.pop(i+1)
         else:
             new_cards.pop(i+1)
-    if len(learning_cards) == 0:
-        if scheduler != 3:
-            flashcard = flashcards[choice(list(new_cards.keys()))-1]
-        else:
-            flashcard = flashcards[0]
-        current_user.last_index = flashcards.index(flashcard)
-    else:
-        index = min(learning_cards, key=learning_cards.get)
-        difference = 0.5-learning_cards[index]
-
-        #introduce a word when lowest word percentage is above 90%
-        if scheduler != 3:
-            if difference < -0.4 and len(new_cards) > 0:
+    if current == 0:
+        if len(learning_cards) == 0:
+            if scheduler != 3:
                 flashcard = flashcards[choice(list(new_cards.keys()))-1]
             else:
-                flashcard = flashcards[index-1]
-        else:
-            if current_user.last_index == len(flashcards)-1:
                 flashcard = flashcards[0]
+            current_user.last_index = flashcards.index(flashcard)
+        else:
+            index = min(learning_cards, key=learning_cards.get)
+            difference = 0.5-learning_cards[index]
+
+            #introduce a word when lowest word percentage is above 90%
+            if scheduler != 3:
+                if difference < -0.4 and len(new_cards) > 0:
+                    flashcard = flashcards[choice(list(new_cards.keys()))-1]
+                else:
+                    flashcard = flashcards[index-1]
             else:
-                flashcard = flashcards[current_user.last_index+1]
+                if current_user.last_index == len(flashcards)-1:
+                    flashcard = flashcards[0]
+                else:
+                    flashcard = flashcards[current_user.last_index+1]
+    else:
+        flashcard = Flashcard.query.get_or_404(current)
 
-        current_user.last_index = flashcards.index(flashcard)
-
-        print(flashcard.question)
+    current_user.last_index = flashcards.index(flashcard)
+    print(flashcard.question)
 
     chance = round(round(flashcard_generated[flashcards.index(flashcard)+1],2)*100)
     overall_sum = sum(flashcard_generated.values())
@@ -298,6 +304,9 @@ def learn(id):
             seen += 1
 
     time_left = round(SESSION_LENGTH - current_user.total_reps*(1/6),2)
+
+    if flashcard.history == '' and flashcard.pre_answer != 1:
+        return render_template('pretest.html', flashcard=flashcard, collection=flashcardcollection)
 
     return render_template('learn.html', flashcard=flashcard, collection=flashcardcollection, chance=chance, overall_sum=overall_sum, overall_len=overall_len, seen=seen, time_left=time_left, leaderboards=leaderboards)
 
@@ -357,6 +366,7 @@ def reset_cards(id):
     coll = FlashcardCollection.query.get_or_404(id)
     current_user.total_reps = 0
     current_user.last_index = 0
+    current_user.score = 0
 
     for card in coll.flashcards.all():
         card.history = ''
@@ -417,7 +427,7 @@ def wrong_answer(collId, cardId, duration):
     flashcard.last_time = current_time
     db.session.add(flashcard)
     db.session.commit()
-    return redirect(url_for('.learn', id=collId, mode='normal'))
+    return redirect(url_for('.learn', id=collId, current=0, mode='normal'))
 
 @main.route('/flashcardcollection/<int:collId>/learn/<int:cardId>/right/<int:duration>')
 @login_required
@@ -452,7 +462,7 @@ def right_answer(collId, cardId, duration):
     flashcard.last_time = current_time
     db.session.add(flashcard)
     db.session.commit()
-    return redirect(url_for('.learn', id=collId, mode='normal'))
+    return redirect(url_for('.learn', id=collId, current=0, mode='normal'))
 
 @main.route('/flashcardcollection/<int:collId>/test/<int:cardId>/wrong/<int:duration>')
 @login_required
@@ -479,10 +489,11 @@ def test_right(collId, cardId, duration):
 @main.route('/flashcardcollection/<int:collId>/test/<int:cardId>/next')
 @login_required
 def next(collId, cardId):
+    flashcardcollection = FlashcardCollection.query.get_or_404(collId)
     flashcard = Flashcard.query.get_or_404(cardId)
 
     flashcard.pre_answer = 1
 
     db.session.add(flashcard)
     db.session.commit()
-    return redirect(url_for('.pretest', id=collId, mode='normal'))
+    return redirect(url_for('.learn', id=collId, current=cardId, mode='normal'))

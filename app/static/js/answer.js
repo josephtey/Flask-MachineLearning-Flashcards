@@ -73,16 +73,18 @@ function showAnswer() {
     //
     //     }
     // }
-    setTimeout(function(){
-      if (localStorage.getItem('outcome') == 'true') {
-          console.log('correct');
-          right_link.click();
-      } else {
-          console.log('wrong')
-          wrong_link.click();
+    if (localStorage.getItem('outcome') == 'true') {
+      setTimeout(function(){
+        console.log('correct');
+        right_link.click();
+      }, 500);
+    } else {
+      setTimeout(function(){
+        console.log('wrong')
+        wrong_link.click();
+      }, 3000);
+    }
 
-      }
-    }, 3000);
     answer.style.display = 'block';
     buttons.style.display = 'none'
 
@@ -161,6 +163,86 @@ var Stopwatch = function(elem, options) {
   function update() {
     clock += delta();
     render();
+    if (timer.innerText == '15'){
+      showAnswer();
+    }
+  }
+
+  function render() {
+    timer.innerHTML = Math.round(clock/1000);
+  }
+
+  function delta() {
+    var now = Date.now(),
+        d   = now - offset;
+
+    offset = now;
+    return d;
+  }
+
+  // public API
+  this.start  = start;
+  this.stop   = stop;
+  this.reset  = reset;
+}
+var SecondStopwatch = function(elem, options) {
+
+  var timer       = createTimer(),
+      offset,
+      clock,
+      interval;
+
+  // default options
+  options = options || {};
+  options.delay = options.delay || 1;
+
+  // append elements
+  elem.appendChild(timer);
+
+  // initialize
+  reset();
+  start();
+  // private functions
+  function createTimer() {
+    return document.createElement("span");
+  }
+
+  function createButton(action, handler) {
+    var a = document.createElement("a");
+    a.href = "#" + action;
+    a.innerHTML = action;
+    a.addEventListener("click", function(event) {
+      handler();
+      event.preventDefault();
+    });
+    return a;
+  }
+
+  function start() {
+    if (!interval) {
+      offset   = Date.now();
+      interval = setInterval(update, options.delay);
+    }
+  }
+
+  function stop() {
+    if (interval) {
+      clearInterval(interval);
+      interval = null;
+    }
+  }
+
+  function reset() {
+    clock = 0;
+    render();
+  }
+
+  function update() {
+    clock += delta();
+    render();
+    if (timer.innerText == '5'){
+      document.getElementById('next').click();
+    }
   }
 
   function render() {

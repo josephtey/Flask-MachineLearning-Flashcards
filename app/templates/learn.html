@@ -3,7 +3,7 @@
 {% block title %}Flashcard - Learning Collection {{ name }}{% endblock %}
 
 {% block page_content %}
-    <p style="font-size: 20px; font-family: helvetica; text-align: center">{{time_left}} minutes<p>
+    <p style="font-size: 20px; font-family: helvetica; text-align: center">Time left: {{time_left}} minutes<p>
       <div class="panel panel-default" style="float:left; position:absolute">
         <div class="panel-body">
           <b>Leaderboards</b> <br></br>
@@ -82,14 +82,10 @@
     <!-- <script src='https://code.responsivevoice.org/responsivevoice.js'></script> -->
 
     <script type="text/javascript">
-        // var obj = { {{flashcard.answer}} : 'John' };
-        // for(key in obj)
-        //     var answer = key
-        // console.log(answer)
-        // responsiveVoice.speak(answer, "Chinese Female", {rate: 0.7});
 
         var elem = document.getElementById("my-stopwatch");
         var timer = new Stopwatch(elem, {delay: 10});
+
 
     </script>
 

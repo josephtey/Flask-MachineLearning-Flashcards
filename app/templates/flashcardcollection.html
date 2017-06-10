@@ -12,7 +12,7 @@
     </div>
     <a href="{{ url_for('.pretest', id=flashcardcollection.id, mode='start') }}"><span
             class="btn btn-primary btn-learn">Pre-Test</span></a>
-    <a href="{{ url_for('.learn', id=flashcardcollection.id, mode='start') }}"><span
+    <a href="{{ url_for('.learn', id=flashcardcollection.id, current=0, mode='start') }}"><span
             class="btn btn-primary btn-learn">Learn All</span></a>
     <a href="{{ url_for('.test', id=flashcardcollection.id, mode='normal') }}"><span
             class="btn btn-primary btn-learn">Test</span></a>
