@@ -3,12 +3,15 @@
 {% block title %}Flashcards{% endblock %}
 
 {% block page_content %}
-    <div class="page-header">
-    	<h1>Student Flashcard Experiment</h1>
-    </div>
 
+{% if current_user.is_authenticated %}{% else %}
+<div class="front-outer">
+  <span class="front-inner">
+    hi there, <a href="auth/login"><span class="btn primary-btn" style="margin-top:5px;padding:10px 20px; border:1px solid #cccccc; color:#aaaaaa;border-radius:10px; margin: 0 20px;font-size:20px; font-weight:normal">login</span></a> to begin.
+  </span>
+</div>
 
-    {% if current_user.is_authenticated %}{% else %}<a href="auth/login"><span class="btn btn-primary">Login{% endif %}</span></a>
+{% endif %}
 
     {% include '_flashcardcollections.html' %}
 {% endblock %}

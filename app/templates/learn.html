@@ -9,7 +9,7 @@
           <b>Leaderboards</b> <br></br>
           <ol style="text-align: left; margin: 0; padding-left:19px">
             {% for key in leaderboards.keys() %}
-              <li><b>User {{key}}</b> - {{leaderboards[key]}}</li>
+              <li><b>{{key}}</b> - {{leaderboards[key]}}</li>
             {% endfor %}
           </ol>
         </div>
@@ -39,7 +39,7 @@
               </div>
               <div class="row">
                   <div class="col-md-8 col-md-offset-2">
-                      <input type="text" class="form-control" id="response" onkeydown="detect(event)"  autofocus="autofocus" >
+                      <input type="text" class="form-control" id="response" onkeydown="detect(event)"  autofocus="autofocus" placeholder="english translation">
                   </div>
               </div>
               <div id="buttons">

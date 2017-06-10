@@ -170,7 +170,7 @@ def learn(id):
     c = conn.cursor()
 
     for row in c.execute("SELECT rowid, * FROM users ORDER BY id"):
-        user_ids.append(row[0])
+        user_ids.append(row[3])
         total_reps.append(row[-2])
 
     pre_dict = dict(zip(user_ids, total_reps))
