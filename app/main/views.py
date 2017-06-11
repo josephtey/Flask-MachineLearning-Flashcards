@@ -303,7 +303,7 @@ def learn(id, current):
         if flashcard_generated[i+1] > 0:
             seen += 1
 
-    time_left = round(SESSION_LENGTH - current_user.total_reps*(1/6),2)
+    time_left = round(SESSION_LENGTH - current_user.total_reps*(1/8),2)
 
     if flashcard.history == '' and flashcard.pre_answer != 1:
         return render_template('pretest.html', flashcard=flashcard, collection=flashcardcollection, overall_sum=overall_sum, overall_len=overall_len, seen=seen, time_left=time_left, leaderboards=leaderboards)

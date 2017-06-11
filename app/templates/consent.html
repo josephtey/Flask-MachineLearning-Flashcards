@@ -6,11 +6,22 @@
 
     <h1>consent</h1> <br/>
     <p style="font-size:15px">
+      <b style="font-size:20px">What is this?</b> <br>
       My name is Joseph Tey; I am currently a student in Year 10, undertaking a VCE subject known as Extended Investigation. My research investigates computer-assisted tools to enhance student learning.
       <br><br>
-      Participation in this experiment is completely voluntary and anonymous. Care has been taken to ensure the protection of your privacy and anonymity. The experiment should take no more than 25 minutes.
+      This experiment tests the effectiveness of a flashcard software I have developed. You will be asked to learn English translations of Japanese words on the topic of social/environmental issues.
+
       <br><br>
-      By clicking 'proceed', you agree to the following terms:<br>
+      To ensure quality data for post analysis, I would be grateful if you could focus and actively participate; the experiment will only last 20-30 minutes.
+      <br><br>
+      <b style="font-size:20px">Why should I do this?</b> <br>
+      <ol style="font-size:15px">
+        <li>If you're unsure of effective ways to memorise vocabulary, this may help.</li>
+        <li>A TEST will be conducted tomorrow; this is your only opportunity to revise for the test.</li>
+      </ol><br>
+
+      <b style="font-size:20px">Agreements</b> <br><br>
+      By clicking 'begin', you agree to the following terms:<br>
       <ol style="font-size:15px">
         <li>The use of your responses for analysis and collection only by the conductor of this study; Joseph Tey.</li>
         <li>Sharing of anonymous results, through presentations, between assessment authorities, such as VCAA, peers and teachers.</li>
@@ -19,6 +30,6 @@
 
       <p style="font-size:15px">If you wish to ask any questions, please contact Joseph Tey via email: S1032319@haileybury.vic.edu.au</p>
     </p>
-    <a class="btn" style="margin-top:10px;padding:10px 20px; border:1px solid #aaaaaa; color:#aaaaaa;font-size:15px; font-weight:normal" href="{{ url_for('.learn', id=id, current=0, mode='normal') }}">Proceed</a>
+    <a class="btn" style="margin-top:10px;padding:10px 20px; border:1px solid #aaaaaa; color:#aaaaaa;font-size:15px; font-weight:normal" href="{{ url_for('.learn', id=id, current=0, mode='normal') }}">Begin the experiment!</a>
 
 {% endblock %}

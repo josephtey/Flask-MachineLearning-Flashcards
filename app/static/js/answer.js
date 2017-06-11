@@ -63,16 +63,6 @@ function showAnswer() {
       }
     }
 
-    // if (answer.style.display == 'block') {
-    //     if (localStorage.getItem('outcome') == 'true') {
-    //         console.log('correct');
-    //         right_link.click();
-    //     } else {
-    //         console.log('wrong')
-    //         wrong_link.click();
-    //
-    //     }
-    // }
     if (localStorage.getItem('outcome') == 'true') {
       setTimeout(function(){
         console.log('correct');
@@ -240,7 +230,7 @@ var SecondStopwatch = function(elem, options) {
   function update() {
     clock += delta();
     render();
-    if (timer.innerText == '3'){
+    if (timer.innerText == '5'){
       document.getElementById('next').click();
     }
   }
