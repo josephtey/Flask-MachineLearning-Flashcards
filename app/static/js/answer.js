@@ -240,7 +240,7 @@ var SecondStopwatch = function(elem, options) {
   function update() {
     clock += delta();
     render();
-    if (timer.innerText == '5'){
+    if (timer.innerText == '3'){
       document.getElementById('next').click();
     }
   }

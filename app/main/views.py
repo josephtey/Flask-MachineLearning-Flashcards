@@ -178,7 +178,7 @@ def learn(id, current):
     leaderboards = dict(reversed(sorted(pre_dict.items(), key=operator.itemgetter(1))))
 
     #temp vars
-    total_repetitions = SESSION_LENGTH*6
+    total_repetitions = SESSION_LENGTH*8
     repetitions_per_scheduler = total_repetitions/3
     scheduler = 1
 
@@ -239,7 +239,7 @@ def learn(id, current):
 
             elif scheduler == 2:
                 last_answer = history[-1]
-                last_int = last_strength + 8
+                last_int = last_strength + 6
 
                 if last_answer == 1:
                     last_int += 1
@@ -306,7 +306,7 @@ def learn(id, current):
     time_left = round(SESSION_LENGTH - current_user.total_reps*(1/6),2)
 
     if flashcard.history == '' and flashcard.pre_answer != 1:
-        return render_template('pretest.html', flashcard=flashcard, collection=flashcardcollection)
+        return render_template('pretest.html', flashcard=flashcard, collection=flashcardcollection, overall_sum=overall_sum, overall_len=overall_len, seen=seen, time_left=time_left, leaderboards=leaderboards)
 
     return render_template('learn.html', flashcard=flashcard, collection=flashcardcollection, chance=chance, overall_sum=overall_sum, overall_len=overall_len, seen=seen, time_left=time_left, leaderboards=leaderboards)
 
@@ -338,6 +338,8 @@ def pretest(id):
     flashcards = flashcardcollection.flashcards.all()
     mode = request.args.get('mode')
     flashcard = flashcards[0]
+
+
 
     if current_user.last_index == len(flashcards)-1:
         return redirect(url_for('.learn', id=flashcardcollection.id, mode='start'))
@@ -423,7 +425,7 @@ def wrong_answer(collId, cardId, duration):
     if flashcard.last_strength != 0:
         flashcard.last_strength -= 1
     current_user.total_reps += 1
-    current_user.score += 1
+    current_user.score = max(0, current_user.score - 1)
     flashcard.last_time = current_time
     db.session.add(flashcard)
     db.session.commit()
@@ -458,7 +460,7 @@ def right_answer(collId, cardId, duration):
 
     flashcard.last_strength += 1
     current_user.total_reps += 1
-    current_user.score += 3
+    current_user.score += 1
     flashcard.last_time = current_time
     db.session.add(flashcard)
     db.session.commit()

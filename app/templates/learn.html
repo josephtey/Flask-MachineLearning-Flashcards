@@ -27,7 +27,6 @@
                       {% else %}
                           <p>There is a {{chance}}% chance you will remember this</p>
                       {% endif %}
-
                   </span>
                   {% if flashcard.question_html %}
                       <p>{{ flashcard.question_html | safe }}</p>
@@ -43,7 +42,6 @@
                   </div>
               </div>
               <div id="buttons">
-                      <a onclick="showAnswer();"> <span class="btn btn-primary">Don't Know</span></a>
                       <a onclick="showAnswer();"> <span class="btn btn-primary">Submit</span></a>
               </div>
               <div class="learn" id="answer">
@@ -69,8 +67,7 @@
 
 <p style="font-size: 20px; font-family: helvetica; text-align: center">Learning Progress - {{seen}}/{{overall_len}}</p>
 <div class="progress">
-  <div class="progress-bar" role="progressbar" aria-valuenow="{{(overall_sum/overall_len)*100}}" aria-valuemin="0" aria-valuemax="100" style="width:{{(overall_sum/overall_len)*100}}%">
-  </div>
+  <div class="progress-bar" role="progressbar" aria-valuenow="{{(overall_sum/overall_len)*100}}" aria-valuemin="0" aria-valuemax="100" style="width:{{(overall_sum/overall_len)*100}}%"></div>
 </div>
 {% endblock %}
 

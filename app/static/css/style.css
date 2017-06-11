@@ -140,6 +140,9 @@ div.flask-pagedown-preview h3 {
 .green {
     color: green;
 }
+.blue {
+    color: blue;
+}
 #response{
     font-size:15px;
 }

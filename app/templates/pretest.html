@@ -3,6 +3,17 @@
 {% block title %}Flashcard - Learning Collection {{ name }}{% endblock %}
 
 {% block page_content %}
+<p style="font-size: 20px; font-family: helvetica; text-align: center">Time left: {{time_left}} minutes<p>
+  <div class="panel panel-default" style="float:left; position:absolute">
+    <div class="panel-body">
+      <b>Leaderboards</b> <br></br>
+      <ol style="text-align: left; margin: 0; padding-left:19px">
+        {% for key in leaderboards.keys() %}
+          <li><b>{{key}}</b> - {{leaderboards[key]}}</li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
     <div class="learn_word_outer">
         <div class="learn_word_inner">
             <div>
@@ -10,10 +21,13 @@
                   <div class="stopwatch" style="font-size:15px; font-weight:lighter; color:grey">
                       <span id="my-stopwatch"></span> seconds
                   </div>
+                  <span style="font-size:20px; font-weight:lighter; color:grey">
+                      <p>Remember this word!</p>
+                  </span>
                     {% if flashcard.question_html %}
-                        <p>{{ flashcard.question_html | safe }}</p>
+                        <p class="blue">{{ flashcard.question_html | safe }}</p>
                     {% else %}
-                        <p>{{ flashcard.question }}</p>
+                        <p class="blue">{{ flashcard.question }}</p>
                     {% endif %}
                 </div>
 
@@ -30,7 +44,10 @@
 
         </div>
     </div>
-
+    <p style="font-size: 20px; font-family: helvetica; text-align: center">Learning Progress - {{seen}}/{{overall_len}}</p>
+    <div class="progress">
+      <div class="progress-bar" role="progressbar" aria-valuenow="{{(overall_sum/overall_len)*100}}" aria-valuemin="0" aria-valuemax="100" style="width:{{(overall_sum/overall_len)*100}}%"></div>
+    </div>
 {% endblock %}
 
 {% block scripts %}
