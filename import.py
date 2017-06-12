@@ -31,7 +31,6 @@ indexes = range(len(items))
 
 num_per_scheduler = int(round(len(items)/3))
 schedulers = ([1]*num_per_scheduler) + ([2]*num_per_scheduler) + ([3]*(len(items)-(2*num_per_scheduler)))
-shuffle(schedulers)
 
 randomised = {}
 for i in range(len(indexes)):
@@ -40,7 +39,7 @@ print randomised
 
 for i in range(len(items)):
 	index = i+last_id
-	row = "'" + str(index+1) + "','" + str(items[i][1]) + "','<p>" + str(items[i][1]) + "</p>','" + str(items[i][0]) + "','<p>" + str(items[i][0]) + "</p>','" + str(int(last_collection)+1) + "', '', '', '', '', '','" + str(randomised[i]) + "',-1,-1,0,''"
+	row = "'" + str(index+1) + "','" + str(items[i][1]) + "','<p>" + str(items[i][1]) + "</p>','" + str(items[i][0]) + "','<p>" + str(items[i][0]) + "</p>','" + str(int(last_collection)+1) + "', '', '', '', '', '','" + str(randomised[i]) + "',-1,-1,0,'',''"
 	print row
 	c.execute("INSERT INTO flashcard VALUES(" + row + ")")
 

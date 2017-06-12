@@ -17,6 +17,7 @@ import copy
 import pickle
 import sqlite3
 import operator
+from random import randint
 
 #correct, wrong, exponential, intercept/bias
 WEIGHTS = [-1.31889574, -0.46632819,  3.63402041, 6.61932582385]
@@ -172,24 +173,33 @@ def learn(id, current):
 
     for row in c.execute("SELECT rowid, * FROM users ORDER BY id"):
         user_ids.append(row[3])
-        total_reps.append(row[-1])
+        total_reps.append(row[-4])
 
     pre_dict = dict(zip(user_ids, total_reps))
     leaderboards = dict(reversed(sorted(pre_dict.items(), key=operator.itemgetter(1))))
 
     #temp vars
-    total_repetitions = SESSION_LENGTH*8
+    total_repetitions = SESSION_LENGTH*6
     repetitions_per_scheduler = total_repetitions/3
     scheduler = 1
-
+    schedulers = [int(i) for i in current_user.scheduler_order.split(',')]
 
     #set scheduler
-    if current_user.total_reps <= repetitions_per_scheduler:
-        scheduler = 1
-    elif current_user.total_reps > repetitions_per_scheduler and current_user.total_reps <= (2*repetitions_per_scheduler):
-        scheduler = 2
-    elif current_user.total_reps > (2*repetitions_per_scheduler) and current_user.total_reps <= (3*repetitions_per_scheduler):
-        scheduler = 3
+    if current_user.total_reps < repetitions_per_scheduler:
+        if current_user.total_reps == 0 and current_user.set_num == 1:
+            return redirect(url_for('.pause', id=id, start=1, set_id = 1))
+        else:
+            scheduler = schedulers[0]
+    elif current_user.total_reps >= repetitions_per_scheduler and current_user.total_reps < (2*repetitions_per_scheduler):
+        if current_user.total_reps == repetitions_per_scheduler and current_user.set_num == 2:
+            return redirect(url_for('.pause', id=id, start=0, set_id = 2))
+        else:
+            scheduler = schedulers[1]
+    elif current_user.total_reps >= (2*repetitions_per_scheduler) and current_user.total_reps < (3*repetitions_per_scheduler):
+        if current_user.total_reps == (2*repetitions_per_scheduler) and current_user.set_num == 3:
+            return redirect(url_for('.pause', id=id, start=0, set_id = 3))
+        else:
+            scheduler = schedulers[2]
     else:
         return redirect(url_for('.finished'))
 
@@ -197,11 +207,11 @@ def learn(id, current):
     #get words for specific scheduler
     flashcards = []
     for i in range(len(all_flashcards)):
-        if scheduler == 1 and all_flashcards[i].scheduler == 1:
+        if scheduler == schedulers[0] and all_flashcards[i].scheduler == schedulers[0]:
             flashcards.append(all_flashcards[i])
-        elif scheduler == 2 and all_flashcards[i].scheduler == 2:
+        elif scheduler == schedulers[1] and all_flashcards[i].scheduler == schedulers[1]:
             flashcards.append(all_flashcards[i])
-        elif scheduler == 3 and all_flashcards[i].scheduler == 3:
+        elif scheduler == schedulers[2] and all_flashcards[i].scheduler == schedulers[2]:
             flashcards.append(all_flashcards[i])
 
     #debug
@@ -239,7 +249,7 @@ def learn(id, current):
 
             elif scheduler == 2:
                 last_answer = history[-1]
-                last_int = last_strength + 6
+                last_int = last_strength + 7
 
                 if last_answer == 1:
                     last_int += 1
@@ -253,7 +263,7 @@ def learn(id, current):
 
                 p = pclip(math.pow(2, (-time_elapsed)/h))
             else:
-                p = 0.5
+                p = randint(75,90)/100
 
             #assign probability to array
             flashcard_generated[i+1] = p
@@ -303,7 +313,7 @@ def learn(id, current):
         if flashcard_generated[i+1] > 0:
             seen += 1
 
-    time_left = round(SESSION_LENGTH - current_user.total_reps*(1/8),2)
+    time_left = round(SESSION_LENGTH - current_user.total_reps*(1/6),2)
 
     if flashcard.history == '' and flashcard.pre_answer != 1:
         return render_template('pretest.html', flashcard=flashcard, collection=flashcardcollection, overall_sum=overall_sum, overall_len=overall_len, seen=seen, time_left=time_left, leaderboards=leaderboards)
@@ -352,10 +362,17 @@ def pretest(id):
 
     return render_template('pretest.html', flashcard=flashcard, collection=flashcardcollection)
 
+
 @main.route('/flashcardcollection/finished')
 @login_required
 def finished():
     return render_template('finished.html')
+
+@main.route('/flashcardcollection/<int:id>/<int:start>/<int:set_id>/pause')
+@login_required
+def pause(id, start, set_id):
+    current_user.set_num += 1
+    return render_template('pause.html', id=id, start=start, set_id=set_id)
 
 @main.route('/flashcardcollection/<int:id>/consent')
 @login_required
@@ -369,6 +386,7 @@ def reset_cards(id):
     current_user.total_reps = 0
     current_user.last_index = 0
     current_user.score = 0
+    current_user.set_num = 1
 
     for card in coll.flashcards.all():
         card.history = ''

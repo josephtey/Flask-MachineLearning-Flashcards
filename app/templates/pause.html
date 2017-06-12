@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Flashcards{% endblock %}
+
+{% block page_content %}
+
+<div class="front-outer">
+    <div class="front-inner">
+        {% if start %}
+            <p style="font-size:15px; font-weight:normal">You will learn 3 sets of 15 words. Each set will take approx 10 minutes.</p>
+        {% else %}
+            <p>Take a short break. Click continue to begin the next set.</p>
+        {% endif %}
+        <h1>Get ready to begin set {{set_id}} (15 words)</h1>
+        <a class="btn" style="margin-top:10px;padding:10px 20px; border:1px solid #aaaaaa; color:#aaaaaa;font-size:15px; font-weight:normal" href="{{ url_for('.learn', id=id, current=0, mode='normal') }}">Continue</a>
+    </div>
+</div>
+{% endblock %}

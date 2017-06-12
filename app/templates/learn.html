@@ -23,7 +23,7 @@
                   </div>
                   <span style="font-size:20px; font-weight:lighter; color:grey">
                       {% if flashcard.history == '' %}
-                          <p>This is a new word.</p>
+                          <p>Did you remember it? Type it below.</p>
                       {% else %}
                           <p>There is a {{chance}}% chance you will remember this</p>
                       {% endif %}
@@ -42,6 +42,7 @@
                   </div>
               </div>
               <div id="buttons">
+                      <a onclick="showAnswer();"> <span class="btn btn-primary">Don't know</span></a>
                       <a onclick="showAnswer();"> <span class="btn btn-primary">Submit</span></a>
               </div>
               <div class="learn" id="answer">

@@ -150,7 +150,7 @@ div.flask-pagedown-preview h3 {
 .learn_word_outer {
   display: table-cell;
   width: 1170px;
-  height: 500px;
+  height: 70vh;
   vertical-align: middle;
   text-align: center;
 }

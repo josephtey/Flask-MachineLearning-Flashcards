@@ -5,6 +5,7 @@ from flask import current_app, request
 from flask_login import UserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from .. import db, login_manager
+from random import shuffle
 
 
 class User(UserMixin, db.Model):
@@ -19,6 +20,11 @@ class User(UserMixin, db.Model):
     total_reps = db.Column(db.Integer, default=0)
     last_index = db.Column(db.Integer, default=0)
     score = db.Column(db.Integer, default=0)
+    x = [str(i) for i in list(range(1,4))]
+    shuffle(x)
+    x = ','.join(x)
+    scheduler_order = db.Column(db.String, default=x)
+    set_num = db.Column(db.Integer, default=1)
     collections = db.relationship('FlashcardCollection', backref='user', lazy='dynamic')
 
     @property
