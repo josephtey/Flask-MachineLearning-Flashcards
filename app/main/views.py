@@ -25,6 +25,7 @@ WEIGHTS = [-1.31889574, -0.46632819,  3.63402041, 6.61932582385]
 
 #mins
 SESSION_LENGTH = 30
+REP_PER_MIN = 8
 
 def loadPickle(fname):
     with open(fname, 'rb') as handle:
@@ -166,20 +167,20 @@ def learn(id, current):
 
     sqlite_file = 'data-dev.sqlite'
     user_ids = []
-    total_reps = []
+    score = []
 
     conn = sqlite3.connect(sqlite_file)
     c = conn.cursor()
 
     for row in c.execute("SELECT rowid, * FROM users ORDER BY id"):
         user_ids.append(row[3])
-        total_reps.append(row[-6])
+        score.append(row[-9])
 
-    pre_dict = dict(zip(user_ids, total_reps))
+    pre_dict = dict(zip(user_ids, score))
     leaderboards = dict(reversed(sorted(pre_dict.items(), key=operator.itemgetter(1))))
 
     #temp vars
-    total_repetitions = SESSION_LENGTH*7
+    total_repetitions = SESSION_LENGTH*REP_PER_MIN
     repetitions_per_scheduler = round(total_repetitions/3)
     scheduler = 1
     schedulers = [int(i) for i in current_user.scheduler_order.split(',')]
@@ -219,7 +220,6 @@ def learn(id, current):
     print('total reps: ' + str(current_user.total_reps))
 
     flashcard_generated = {}
-    print(flashcards)
     for i in range(len(flashcards)):
         if flashcards[i].history == '' or flashcards[i].last_time == 0:
             #print(str(i+1))
@@ -295,7 +295,23 @@ def learn(id, current):
                 else:
                     flashcard = flashcards[index-1]
             else:
-                if current_user.last_index == len(flashcards)-1:
+                #sequential design
+                # if flashcards.index(flashcards[current_user.last_index]) == 4 and current_user.sequential_cycle < 4:
+                #     current_user.sequential_cycle += 1
+                #     flashcard = flashcards[0]
+                # elif flashcards.index(flashcards[current_user.last_index]) == 9 and current_user.sequential_cycle < 8 and current_user.sequential_cycle >= 4:
+                #     current_user.sequential_cycle += 1
+                #     flashcard = flashcards[4]
+                # elif flashcards.index(flashcards[current_user.last_index]) == 14 and current_user.sequential_cycle < 12 and current_user.sequential_cycle >= 8:
+                #     current_user.sequential_cycle += 1
+                #     flashcard = flashcards[9]
+                # elif flashcards.index(flashcards[current_user.last_index]) == 19 and current_user.sequential_cycle < 16 and current_user.sequential_cycle >= 12:
+                #     current_user.sequential_cycle += 1
+                #     flashcard = flashcards[14]
+                # else:
+                #     flashcard = flashcards[current_user.last_index+1]
+
+                if current_user.last_index+1 == len(flashcards):
                     flashcard = flashcards[0]
                 else:
                     flashcard = flashcards[current_user.last_index+1]
@@ -303,6 +319,7 @@ def learn(id, current):
         flashcard = Flashcard.query.get_or_404(current)
 
     current_user.last_index = flashcards.index(flashcard)
+    current_user.last_time = int(datetime.datetime.now().strftime('%s'))
     flashcard.start_learn_time = int(datetime.datetime.now().strftime('%s'))
 
     chance = round(round(flashcard_generated[flashcards.index(flashcard)+1],2)*100)
@@ -407,6 +424,8 @@ def submit(id, set_id):
 @login_required
 def pause(id, start, ready,set_id):
     current_user.set_num += 1
+    if start:
+        current_user.started = 1
     return render_template('pause.html', id=id, start=start, ready=ready, set_id=set_id)
 
 @main.route('/flashcardcollection/<int:id>/consent')
@@ -425,6 +444,8 @@ def reset_cards(id):
     current_user.feedback_1 = ''
     current_user.feedback_2 = ''
     current_user.feedback_3 = ''
+    current_user.sequential_cycle = 1
+    current_user.started = 0
 
     for card in coll.flashcards.all():
         card.history = ''

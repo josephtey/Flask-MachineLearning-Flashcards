@@ -38,7 +38,7 @@
               </div>
               <div class="row">
                   <div class="col-md-8 col-md-offset-2">
-                      <input name="response" type="text" class="form-control" id="response" onkeydown="detect(event)" placeholder="english translation">
+                      <input name="response" type="text" class="form-control" id="response" onkeydown="detect(event)" placeholder="english translation (enter to submit...)">
                   </div>
               </div>
               <div id="buttons">
@@ -82,13 +82,17 @@
     <!-- <script src='https://code.responsivevoice.org/responsivevoice.js'></script> -->
 
     <script type="text/javascript">
-
-
-        document.getElementById("response").focus();
-
         var elem = document.getElementById("my-stopwatch");
         var timer = new Stopwatch(elem, {delay: 10});
 
+        //<![CDATA[
+        var input  = document.getElementById('response');
+
+        input.addEventListener('focusin', function(event) {
+          console.log('focus');
+          console.log(event);
+        });
+        var t = setTimeout("input.focus();",5);
 
     </script>
 

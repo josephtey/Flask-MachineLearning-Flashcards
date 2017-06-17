@@ -28,6 +28,9 @@ class User(UserMixin, db.Model):
     feedback_1 = db.Column(db.Text, default='')
     feedback_2 = db.Column(db.Text, default='')
     feedback_3 = db.Column(db.Text, default='')
+    sequential_cycle = db.Column(db.Integer, default=1)
+    started = db.Column(db.Integer, default=0)
+    last_time = db.Column(db.Integer)
 
     collections = db.relationship('FlashcardCollection', backref='user', lazy='dynamic')
 
