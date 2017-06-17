@@ -41,7 +41,7 @@ print randomised
 
 for i in range(len(items)):
 	index = i+last_id
-	row = "'" + str(index+1) + "','" + str(items[i][1]) + "','<p>" + str(items[i][1]) + "</p>','" + str(items[i][0]) + "','<p>" + str(items[i][0]) + "</p>','" + str(int(last_collection)+1) + "', '', '', '', '', '','" + str(randomised[i]) + "',-1,-1,0,'',''"
+	row = "'" + str(index+1) + "','" + str(items[i][1]) + "','<p>" + str(items[i][1]) + "</p>','" + str(items[i][0]) + "','<p>" + str(items[i][0]) + "</p>','" + str(int(last_collection)+1) + "', '', '', '', '', '','" + str(randomised[i]) + "',-1,-1,0,'','',0"
 	print row
 	c.execute("INSERT INTO flashcard VALUES(" + row + ")")
 

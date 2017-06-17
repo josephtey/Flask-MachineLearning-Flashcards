@@ -25,7 +25,7 @@ WEIGHTS = [-1.31889574, -0.46632819,  3.63402041, 6.61932582385]
 
 #mins
 SESSION_LENGTH = 30
-REP_PER_MIN = 8
+REP_PER_MIN = 7
 
 def loadPickle(fname):
     with open(fname, 'rb') as handle:
