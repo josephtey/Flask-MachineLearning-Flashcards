@@ -9,7 +9,11 @@
       <b>Leaderboards</b> <br></br>
       <ol style="text-align: left; margin: 0; padding-left:19px">
         {% for key in leaderboards.keys() %}
+          {% if current_user.username == key %}
+          <li class="red"><b>{{key}}</b> - {{leaderboards[key]}}</li>
+          {% else %}
           <li><b>{{key}}</b> - {{leaderboards[key]}}</li>
+          {% endif %}
         {% endfor %}
       </ol>
     </div>

@@ -24,7 +24,7 @@ WEIGHTS = [-1.31889574, -0.46632819,  3.63402041, 6.61932582385]
 
 
 #mins
-SESSION_LENGTH = 1
+SESSION_LENGTH = 30
 
 def loadPickle(fname):
     with open(fname, 'rb') as handle:
@@ -173,7 +173,7 @@ def learn(id, current):
 
     for row in c.execute("SELECT rowid, * FROM users ORDER BY id"):
         user_ids.append(row[3])
-        total_reps.append(row[-4])
+        total_reps.append(row[-6])
 
     pre_dict = dict(zip(user_ids, total_reps))
     leaderboards = dict(reversed(sorted(pre_dict.items(), key=operator.itemgetter(1))))
