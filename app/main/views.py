@@ -311,7 +311,7 @@ def learn(id, current):
                 # else:
                 #     flashcard = flashcards[current_user.last_index+1]
 
-                if current_user.last_index+1 == len(flashcards):
+                if current_user.last_index == len(flashcards)-1:
                     flashcard = flashcards[0]
                 else:
                     flashcard = flashcards[current_user.last_index+1]
@@ -391,6 +391,7 @@ def questions(id, cycle, set_id):
 def submit(id, set_id):
     field1 = request.args.get('field1')
     if set_id == 4:
+        spec = request.args.get('spec')
         field2 = request.args.get('field2')
         field3 = request.args.get('field3')
         field4 = request.args.get('field4')
@@ -398,7 +399,7 @@ def submit(id, set_id):
         field6 = request.args.get('field6')
         field7 = request.args.get('field7')
         field8 = request.args.get('field8')
-        feedback = field1 + ',' + field2 + ',' + field3 + ',' + field4 + ',' + field5 + ',' + field6 + ',' + field7 + ',' + field8
+        feedback = spec + ',' + field1 + ',' + field2 + ',' + field3 + ',' + field4 + ',' + field5 + ',' + field6 + ',' + field7 + ',' + field8
     else:
         feedback = field1
 
@@ -446,6 +447,7 @@ def reset_cards(id):
     current_user.feedback_3 = ''
     current_user.sequential_cycle = 1
     current_user.started = 0
+    current_user.last_time = 0
 
     for card in coll.flashcards.all():
         card.history = ''
