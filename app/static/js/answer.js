@@ -1,6 +1,12 @@
-/**
- * Created by raeste on 09.03.17.
- */
+function jsToJinja(x) {
+    $.getJSON($SCRIPT_ROOT + '/check_selected', {
+    post: x
+    }, function(data) {
+        var response = data.result;
+        console.log(response);
+        }
+    );
+}
 function ld(a, b) {
     if(a.length == 0) return b.length;
     if(b.length == 0) return a.length;
@@ -74,7 +80,6 @@ function showAnswer() {
         wrong_link.click();
       }, 3000);
     }
-
     answer.style.display = 'block';
     buttons.style.display = 'none'
 

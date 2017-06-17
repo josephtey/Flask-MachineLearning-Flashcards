@@ -28,17 +28,13 @@
                           <p>There is a {{chance}}% chance you will remember this</p>
                       {% endif %}
                   </span>
-                  {% if flashcard.question_html %}
-                      <p>{{ flashcard.question_html | safe }}</p>
-                  {% else %}
-                      <p>{{ flashcard.question }}</p>
-                  {% endif %}
+                  <p>{{ flashcard.question }}</p>
                 </div>
 
               </div>
               <div class="row">
                   <div class="col-md-8 col-md-offset-2">
-                      <input type="text" class="form-control" id="response" onkeydown="detect(event)"  autofocus="autofocus" placeholder="english translation">
+                      <input name="response" type="text" class="form-control" id="response" onkeydown="detect(event)" placeholder="english translation">
                   </div>
               </div>
               <div id="buttons">
@@ -77,9 +73,14 @@
 
 
     <script src="{{ url_for('static', filename='js/answer.js') }}"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
     <!-- <script src='https://code.responsivevoice.org/responsivevoice.js'></script> -->
 
     <script type="text/javascript">
+
+
+        document.getElementById("response").focus();
 
         var elem = document.getElementById("my-stopwatch");
         var timer = new Stopwatch(elem, {delay: 10});

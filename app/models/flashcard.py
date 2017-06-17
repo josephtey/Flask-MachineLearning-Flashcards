@@ -21,6 +21,7 @@ class Flashcard(db.Model):
     last_strength = db.Column(db.Integer, default = 0)
     introduced_history = db.Column(db.Text, default = '')
     actual_response = db.Column(db.Text, default = '')
+    start_learn_time = db.Column(db.Integer)
     collection_id = db.Column(db.Integer, db.ForeignKey('flashcardcollection.id'))
 
     @staticmethod

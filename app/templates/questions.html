@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Flashcard - Learning Collection {{ name }}{% endblock %}
+{% block page_content %}
+
+<h1>Set {{set_id-1}} is finished. <br/></h1>
+
+{% if set_id == 4 %}
+<h2>The experiment is finished. Please answer the final few questions.</h2>
+{% else %}
+<h2>Take a break; please answer some questions.</h2>
+{% endif %}
+    <form action="/submit/{{id}}/{{set_id}}">
+      <p><b>Q1: </b>If you had a test tomorow, what percentage do you think you will achieve for each set?</p>
+      <label>Set 1:</label>
+      <input name="field1" class="form-control" type="text"> <br/>
+
+      <label>Set 2:</label>
+      <input name="field2" class="form-control" type="text"></input> <br/>
+
+      <label>Set 3:</label>
+      <input name="field3" class="form-control" type="text"></input> <br/><br/>
+
+      <p><b>Q2: </b>Were the difficulties of the words in each set similar? Or noticably different?</p>
+      <textarea name="field4" class="form-control" rows=2></textarea> <br/>
+
+      <p><b>Q3: </b>What were your motivation levels throughout? Did you get bored? Too long?</p>
+      <textarea name="field5" class="form-control" rows=2></textarea> <br/>
+
+      <p><b>Q4: </b>Which set did you learn most efficiently, and why do you think so?</p>
+      <textarea name="field6" class="form-control" rows=2></textarea> <br/>
+
+      <p><b>Q5: </b>Was there too much repetition to enforce learning? Was it too easy?</p>
+      <textarea name="field7" class="form-control" rows=2></textarea> <br/>
+
+      <p><b>Q6: </b>How did you associate the Japanese word with the English translation? Pronunciation? Pattern/Images?</p>
+      <textarea name="field8" class="form-control" rows=2></textarea> <br/>
+
+
+      <input type="submit" value="Submit" class="btn btn-primary"/>
+
+    </form>
+
+
+
+{% endblock %}

@@ -30,7 +30,9 @@ c.execute("INSERT INTO flashcardcollection VALUES('" + str(int(last_collection)+
 indexes = range(len(items))
 
 num_per_scheduler = int(round(len(items)/3))
-schedulers = ([1]*num_per_scheduler) + ([2]*num_per_scheduler) + ([3]*(len(items)-(2*num_per_scheduler)))
+s = [1,2,3]
+shuffle(s)
+schedulers = ([s[0]]*num_per_scheduler) + ([s[1]]*num_per_scheduler) + ([s[2]]*(len(items)-(2*num_per_scheduler)))
 
 randomised = {}
 for i in range(len(indexes)):

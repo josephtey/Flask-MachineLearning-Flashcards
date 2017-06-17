@@ -180,3 +180,6 @@ div.flask-pagedown-preview h3 {
   font-size: 30px;
   font-weight:bold
 }
+.container {
+  padding: 10px !important
+}

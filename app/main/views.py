@@ -179,29 +179,29 @@ def learn(id, current):
     leaderboards = dict(reversed(sorted(pre_dict.items(), key=operator.itemgetter(1))))
 
     #temp vars
-    total_repetitions = SESSION_LENGTH*6
-    repetitions_per_scheduler = total_repetitions/3
+    total_repetitions = SESSION_LENGTH*7
+    repetitions_per_scheduler = round(total_repetitions/3)
     scheduler = 1
     schedulers = [int(i) for i in current_user.scheduler_order.split(',')]
 
     #set scheduler
     if current_user.total_reps < repetitions_per_scheduler:
         if current_user.total_reps == 0 and current_user.set_num == 1:
-            return redirect(url_for('.pause', id=id, start=1, set_id = 1))
+            return redirect(url_for('.pause', id=id, start=1, ready=1, set_id = 1))
         else:
             scheduler = schedulers[0]
     elif current_user.total_reps >= repetitions_per_scheduler and current_user.total_reps < (2*repetitions_per_scheduler):
         if current_user.total_reps == repetitions_per_scheduler and current_user.set_num == 2:
-            return redirect(url_for('.pause', id=id, start=0, set_id = 2))
+            return redirect(url_for('.questions', id=id, set_id=2, cycle=0))
         else:
             scheduler = schedulers[1]
     elif current_user.total_reps >= (2*repetitions_per_scheduler) and current_user.total_reps < (3*repetitions_per_scheduler):
         if current_user.total_reps == (2*repetitions_per_scheduler) and current_user.set_num == 3:
-            return redirect(url_for('.pause', id=id, start=0, set_id = 3))
+            return redirect(url_for('.questions', id=id, set_id=3, cycle=0))
         else:
             scheduler = schedulers[2]
     else:
-        return redirect(url_for('.finished'))
+        return redirect(url_for('.questions', id=flashcardcollection.id, set_id=4, cycle=0))
 
 
     #get words for specific scheduler
@@ -249,7 +249,7 @@ def learn(id, current):
 
             elif scheduler == 2:
                 last_answer = history[-1]
-                last_int = last_strength + 7
+                last_int = last_strength + 8
 
                 if last_answer == 1:
                     last_int += 1
@@ -303,7 +303,7 @@ def learn(id, current):
         flashcard = Flashcard.query.get_or_404(current)
 
     current_user.last_index = flashcards.index(flashcard)
-    print(flashcard.question)
+    flashcard.start_learn_time = int(datetime.datetime.now().strftime('%s'))
 
     chance = round(round(flashcard_generated[flashcards.index(flashcard)+1],2)*100)
     overall_sum = sum(flashcard_generated.values())
@@ -313,7 +313,7 @@ def learn(id, current):
         if flashcard_generated[i+1] > 0:
             seen += 1
 
-    time_left = round(SESSION_LENGTH - current_user.total_reps*(1/6),2)
+    time_left = round(SESSION_LENGTH - current_user.total_reps*(1/7),2)
 
     if flashcard.history == '' and flashcard.pre_answer != 1:
         return render_template('pretest.html', flashcard=flashcard, collection=flashcardcollection, overall_sum=overall_sum, overall_len=overall_len, seen=seen, time_left=time_left, leaderboards=leaderboards)
@@ -363,16 +363,37 @@ def pretest(id):
     return render_template('pretest.html', flashcard=flashcard, collection=flashcardcollection)
 
 
-@main.route('/flashcardcollection/finished')
+@main.route('/<int:id>/questions/<int:cycle>/<int:set_id>')
 @login_required
-def finished():
-    return render_template('finished.html')
+def questions(id, cycle, set_id):
+    if cycle:
+        flash('Please fill in ALL the fields.')
+    return render_template('questions.html', id=id, set_id=set_id)
 
-@main.route('/flashcardcollection/<int:id>/<int:start>/<int:set_id>/pause')
+@main.route('/submit/<int:id>/<int:set_id>')
+def submit(id, set_id):
+    field1 = request.args.get('field1')
+    field2 = request.args.get('field2')
+    field3 = request.args.get('field3')
+    field4 = request.args.get('field4')
+    field5 = request.args.get('field5')
+    field6 = request.args.get('field6')
+    field7 = request.args.get('field7')
+    field8 = request.args.get('field8')
+
+    feedback = field1 + ',' + field2 + ',' + field3 + ',' + field4 + ',' + field5 + ',' + field6 + ',' + field7 + ',' + field8
+    current_user.feedback = feedback
+
+    if field1 == '' or field2 == '' or field3 == '' or field4 == '' or field5 == '' or field6 == '' or field7 == '' or field8 == '':
+        return redirect(url_for('.questions', id=id, cycle=1, set_id=set_id))
+    else:
+        return redirect(url_for('.pause', id=id, start=0, ready=1, set_id=set_id))
+
+@main.route('/flashcardcollection/<int:id>/<int:start>/<int:ready>/<int:set_id>/pause')
 @login_required
-def pause(id, start, set_id):
+def pause(id, start, ready,set_id):
     current_user.set_num += 1
-    return render_template('pause.html', id=id, start=start, set_id=set_id)
+    return render_template('pause.html', id=id, start=start, ready=ready, set_id=set_id)
 
 @main.route('/flashcardcollection/<int:id>/consent')
 @login_required
@@ -387,6 +408,7 @@ def reset_cards(id):
     current_user.last_index = 0
     current_user.score = 0
     current_user.set_num = 1
+    current_user.feedback = ''
 
     for card in coll.flashcards.all():
         card.history = ''
@@ -398,6 +420,7 @@ def reset_cards(id):
         card.pre_answer = -1
         card.last_strength = 0
         card.introduced_history = ''
+        card.start_learn_time = 0
 
     db.session.add(coll)
     db.session.commit()
@@ -416,6 +439,7 @@ def delete_card(collId, cardId):
 @main.route('/flashcardcollection/<int:collId>/learn/<int:cardId>/wrong/<int:duration>')
 @login_required
 def wrong_answer(collId, cardId, duration):
+    print('response' + str(duration))
     flashcard = Flashcard.query.get_or_404(cardId)
     current_time = int(datetime.datetime.now().strftime('%s'))
 
@@ -439,6 +463,11 @@ def wrong_answer(collId, cardId, duration):
         flashcard.timestamps += str(current_time)
     else:
         flashcard.timestamps += ',' + str(current_time)
+
+    if flashcard.durations == '':
+        flashcard.durations += str(current_time-flashcard.start_learn_time-3)
+    else:
+        flashcard.durations += ',' + str(current_time-flashcard.start_learn_time-3)
 
     if flashcard.last_strength != 0:
         flashcard.last_strength -= 1
@@ -475,6 +504,11 @@ def right_answer(collId, cardId, duration):
         flashcard.timestamps += str(current_time)
     else:
         flashcard.timestamps += ',' + str(current_time)
+
+    if flashcard.durations == '':
+        flashcard.durations += str(current_time-flashcard.start_learn_time-0.5)
+    else:
+        flashcard.durations += ',' + str(current_time-flashcard.start_learn_time-0.5)
 
     flashcard.last_strength += 1
     current_user.total_reps += 1

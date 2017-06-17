@@ -11,6 +11,7 @@
 
 <a href="/" class="btn primary-btn" style="padding:10px 20px;margin:20px; border:1px solid #cccccc; color:#cccccc; float:left">
   <span class="glyphicon glyphicon-home" aria-hidden="true"></span> home
+</a>
 {% if current_user.is_authenticated %}
 <a href="{{ url_for('auth.logout') }}" class="btn primary-btn" style="padding:10px 20px;margin:20px; border:1px solid #cccccc; color:#cccccc; float:right">
   <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span> log-out
@@ -20,8 +21,8 @@
   <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span> log-in
 </a>
 {% endif %}
-
-</a>
+<div style="clear:both">
+</div>
 
 
 {% endblock %}
