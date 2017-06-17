@@ -7,10 +7,7 @@
 
 {% if set_id == 4 %}
 <h2>The experiment is finished. Please answer the final few questions.</h2>
-{% else %}
-<h2>Take a break; please answer some questions.</h2>
-{% endif %}
-    <form action="/submit/{{id}}/{{set_id}}">
+<form action="/submit/{{id}}/{{set_id}}">
       <p><b>Q1: </b>If you had a test tomorow, what percentage do you think you will achieve for each set?</p>
       <label>Set 1:</label>
       <input name="field1" class="form-control" type="text"> <br/>
@@ -39,7 +36,19 @@
 
       <input type="submit" value="Submit" class="btn btn-primary"/>
 
-    </form>
+</form>
+{% else %}
+<h2>Take a break; please answer some questions.</h2>
+<form action="/submit/{{id}}/{{set_id}}">
+
+  <p>Do you think the computer assisted you to learn more efficiently? Why or why not?</p><br/>
+  <textarea name="field1" class="form-control" rows=5></textarea> <br/>
+
+  <input type="submit" value="Submit" class="btn btn-primary"/>
+</form>
+{% endif %}
+
+
 
 
 

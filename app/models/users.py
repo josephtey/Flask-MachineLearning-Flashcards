@@ -25,7 +25,9 @@ class User(UserMixin, db.Model):
     x = ','.join(x)
     scheduler_order = db.Column(db.String, default=x)
     set_num = db.Column(db.Integer, default=1)
-    feedback = db.Column(db.Text, default='')
+    feedback_1 = db.Column(db.Text, default='')
+    feedback_2 = db.Column(db.Text, default='')
+    feedback_3 = db.Column(db.Text, default='')
 
     collections = db.relationship('FlashcardCollection', backref='user', lazy='dynamic')
 

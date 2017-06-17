@@ -24,7 +24,7 @@ WEIGHTS = [-1.31889574, -0.46632819,  3.63402041, 6.61932582385]
 
 
 #mins
-SESSION_LENGTH = 30
+SESSION_LENGTH = 1
 
 def loadPickle(fname):
     with open(fname, 'rb') as handle:
@@ -373,21 +373,35 @@ def questions(id, cycle, set_id):
 @main.route('/submit/<int:id>/<int:set_id>')
 def submit(id, set_id):
     field1 = request.args.get('field1')
-    field2 = request.args.get('field2')
-    field3 = request.args.get('field3')
-    field4 = request.args.get('field4')
-    field5 = request.args.get('field5')
-    field6 = request.args.get('field6')
-    field7 = request.args.get('field7')
-    field8 = request.args.get('field8')
-
-    feedback = field1 + ',' + field2 + ',' + field3 + ',' + field4 + ',' + field5 + ',' + field6 + ',' + field7 + ',' + field8
-    current_user.feedback = feedback
-
-    if field1 == '' or field2 == '' or field3 == '' or field4 == '' or field5 == '' or field6 == '' or field7 == '' or field8 == '':
-        return redirect(url_for('.questions', id=id, cycle=1, set_id=set_id))
+    if set_id == 4:
+        field2 = request.args.get('field2')
+        field3 = request.args.get('field3')
+        field4 = request.args.get('field4')
+        field5 = request.args.get('field5')
+        field6 = request.args.get('field6')
+        field7 = request.args.get('field7')
+        field8 = request.args.get('field8')
+        feedback = field1 + ',' + field2 + ',' + field3 + ',' + field4 + ',' + field5 + ',' + field6 + ',' + field7 + ',' + field8
     else:
-        return redirect(url_for('.pause', id=id, start=0, ready=1, set_id=set_id))
+        feedback = field1
+
+    if set_id == 2:
+        current_user.feedback_1 = feedback
+    elif set_id == 3:
+        current_user.feedback_2 = feedback
+    else:
+        current_user.feedback_3 = feedback
+
+    if set_id == 4:
+        if field1 == '' or field2 == '' or field3 == '' or field4 == '' or field5 == '' or field6 == '' or field7 == '' or field8 == '':
+            return redirect(url_for('.questions', id=id, cycle=1, set_id=set_id))
+        else:
+            return redirect(url_for('.pause', id=id, start=0, ready=1, set_id=set_id))
+    else:
+        if field1 == '':
+            return redirect(url_for('.questions', id=id, cycle=1, set_id=set_id))
+        else:
+            return redirect(url_for('.pause', id=id, start=0, ready=1, set_id=set_id))
 
 @main.route('/flashcardcollection/<int:id>/<int:start>/<int:ready>/<int:set_id>/pause')
 @login_required
@@ -408,7 +422,9 @@ def reset_cards(id):
     current_user.last_index = 0
     current_user.score = 0
     current_user.set_num = 1
-    current_user.feedback = ''
+    current_user.feedback_1 = ''
+    current_user.feedback_2 = ''
+    current_user.feedback_3 = ''
 
     for card in coll.flashcards.all():
         card.history = ''
