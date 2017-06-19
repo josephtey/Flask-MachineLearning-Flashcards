@@ -9,8 +9,8 @@
         {% if set_id == 4 %}
         <h1>Thank you; the experiment is finished.</h1>
         {% else %}
-        <p style="font-size:15px; font-weight:normal">You will learn 3 sets of 20 words. Each set will take approx. 10 minutes.</p>
-        <h1>Get ready to begin set {{set_id}} (15 words)</h1>
+        <p style="font-size:15px; font-weight:normal">You will learn 2 sets of 30 words. Each set will take approx. 15 minutes.</p>
+        <h1>Get ready to begin set {{set_id}} (30 words)</h1>
         <a class="btn" style="margin-top:10px;padding:10px 20px; border:1px solid #aaaaaa; color:#aaaaaa;font-size:15px; font-weight:normal" href="{{ url_for('.learn', id=id, current=0, mode='normal') }}">Continue</a>
         {% endif %}
     </div>

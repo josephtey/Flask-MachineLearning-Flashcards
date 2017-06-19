@@ -3,15 +3,16 @@
 {% block title %}Flashcard - Learning Collection {{ name }}{% endblock %}
 {% block page_content %}
 
-<h1>Set {{set_id-1}} is finished. <br/></h1>
+
 
 {% if set_id == 4 %}
-<h2>The experiment is finished.</h2>
+<h1>The experiment is finished.</h1><br/>
 <form action="/submit/{{id}}/{{set_id}}">
+      <b>For the second set...</b>
       <p>Do you think the computer assisted you to learn more efficiently? Why or why not?</p>
       <textarea name="spec" class="form-control" rows=5></textarea><br/>
 
-      <h2>Please answer a few final questions regarding your learning</h2>
+      <h2>Please answer a few final questions regarding BOTH sets.</h2>
       <p><b>Q1: </b>If you had a test tomorow, what percentage do you think you will achieve for each set?</p>
       <label>Set 1:</label>
       <input name="field1" class="form-control" type="text"> <br/>
@@ -42,9 +43,10 @@
 
 </form>
 {% else %}
+<h1>Set {{set_id-1}} is finished.</h1><br/>
 <h2>Take a break; please answer some questions.</h2> <br/>
 <form action="/submit/{{id}}/{{set_id}}">
-
+  <b>For set {{set_id-1}}</b>
   <p>Do you think the computer assisted you to learn more efficiently? Why or why not?</p>
   <textarea name="field1" class="form-control" rows=5></textarea><br/>
 

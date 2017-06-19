@@ -20,12 +20,12 @@ import operator
 from random import randint
 
 #correct, wrong, exponential, intercept/bias
-WEIGHTS = [-1.31889574, -0.46632819,  3.63402041, 6.61932582385]
-
+WEIGHTS = [1.31889574, -0.46632819,  3.63402041, 6.61932582385]
 
 #mins
 SESSION_LENGTH = 30
 REP_PER_MIN = 7
+DESIGN = 2
 
 def loadPickle(fname):
     with open(fname, 'rb') as handle:
@@ -181,9 +181,9 @@ def learn(id, current):
 
     #temp vars
     total_repetitions = SESSION_LENGTH*REP_PER_MIN
-    repetitions_per_scheduler = round(total_repetitions/3)
     scheduler = 1
     schedulers = [int(i) for i in current_user.scheduler_order.split(',')]
+    repetitions_per_scheduler = round(total_repetitions/DESIGN)
 
     #set scheduler
     if current_user.total_reps < repetitions_per_scheduler:
@@ -196,7 +196,7 @@ def learn(id, current):
             return redirect(url_for('.questions', id=id, set_id=2, cycle=0))
         else:
             scheduler = schedulers[1]
-    elif current_user.total_reps >= (2*repetitions_per_scheduler) and current_user.total_reps < (3*repetitions_per_scheduler):
+    elif current_user.total_reps >= (2*repetitions_per_scheduler) and current_user.total_reps < (3*repetitions_per_scheduler) and DESIGN == 3:
         if current_user.total_reps == (2*repetitions_per_scheduler) and current_user.set_num == 3:
             return redirect(url_for('.questions', id=id, set_id=3, cycle=0))
         else:
@@ -212,8 +212,10 @@ def learn(id, current):
             flashcards.append(all_flashcards[i])
         elif scheduler == schedulers[1] and all_flashcards[i].scheduler == schedulers[1]:
             flashcards.append(all_flashcards[i])
-        elif scheduler == schedulers[2] and all_flashcards[i].scheduler == schedulers[2]:
-            flashcards.append(all_flashcards[i])
+        else:
+            if DESIGN == 3:
+                if scheduler == schedulers[2] and all_flashcards[i].scheduler == schedulers[2]:
+                    flashcards.append(all_flashcards[i])
 
     #debug
     print('scheduler: ' + str(scheduler))
@@ -243,7 +245,12 @@ def learn(id, current):
                             expo += expo_incre
                 else:
                     expo = 0.0
-                h_power = (correct*WEIGHTS[0])+(wrong*WEIGHTS[1])+(expo*WEIGHTS[2])+WEIGHTS[3]
+
+                #scale the features
+                scaled_correct = math.sqrt(1.0+correct)
+                scaled_wrong = math.sqrt(1.0 + wrong)
+                scaled_expo = math.sqrt(1.0 + expo)
+                h_power = (scaled_correct*WEIGHTS[0])+(scaled_wrong*WEIGHTS[1])+(scaled_expo*WEIGHTS[2])+WEIGHTS[3]
                 h = hclip(math.pow(2, h_power))
                 p = pclip(math.pow(2, (-time_elapsed)/h))
 
@@ -295,26 +302,21 @@ def learn(id, current):
                 else:
                     flashcard = flashcards[index-1]
             else:
-                #sequential design
-                # if flashcards.index(flashcards[current_user.last_index]) == 4 and current_user.sequential_cycle < 4:
-                #     current_user.sequential_cycle += 1
-                #     flashcard = flashcards[0]
-                # elif flashcards.index(flashcards[current_user.last_index]) == 9 and current_user.sequential_cycle < 8 and current_user.sequential_cycle >= 4:
-                #     current_user.sequential_cycle += 1
-                #     flashcard = flashcards[4]
-                # elif flashcards.index(flashcards[current_user.last_index]) == 14 and current_user.sequential_cycle < 12 and current_user.sequential_cycle >= 8:
-                #     current_user.sequential_cycle += 1
-                #     flashcard = flashcards[9]
-                # elif flashcards.index(flashcards[current_user.last_index]) == 19 and current_user.sequential_cycle < 16 and current_user.sequential_cycle >= 12:
-                #     current_user.sequential_cycle += 1
-                #     flashcard = flashcards[14]
-                # else:
-                #     flashcard = flashcards[current_user.last_index+1]
-
-                if current_user.last_index == len(flashcards)-1:
+                #massed grouped design
+                if flashcards.index(flashcards[current_user.last_index]) == 14 and current_user.sequential_cycle < 7:
+                    current_user.sequential_cycle += 1
                     flashcard = flashcards[0]
+                elif flashcards.index(flashcards[current_user.last_index]) == 29 and current_user.sequential_cycle < 14 and current_user.sequential_cycle >= 7:
+                    current_user.sequential_cycle += 1
+                    flashcard = flashcards[14]
                 else:
                     flashcard = flashcards[current_user.last_index+1]
+
+                #sequential design
+                # if current_user.last_index == len(flashcards)-1:
+                #     flashcard  = flashcards[0]
+                # else:
+                #     flashcard = flashcards[current_user.last_index+1]
     else:
         flashcard = Flashcard.query.get_or_404(current)
 
@@ -322,7 +324,7 @@ def learn(id, current):
     current_user.last_time = int(datetime.datetime.now().strftime('%s'))
     flashcard.start_learn_time = int(datetime.datetime.now().strftime('%s'))
 
-    chance = round(round(flashcard_generated[flashcards.index(flashcard)+1],2)*100)
+    chance = round(round(flashcard_generated[flashcards.index(flashcard)+1],2)*100)-11
     overall_sum = sum(flashcard_generated.values())
     overall_len = len(flashcard_generated.values())
     seen = 0
@@ -330,7 +332,9 @@ def learn(id, current):
         if flashcard_generated[i+1] > 0:
             seen += 1
 
-    time_left = round(SESSION_LENGTH - current_user.total_reps*(1/7),2)
+    time_left = round(SESSION_LENGTH - current_user.total_reps/7,2)
+    if current_user.total_reps/7 < SESSION_LENGTH/2:
+        time_left -= 15
 
     if flashcard.history == '' and flashcard.pre_answer != 1:
         return render_template('pretest.html', flashcard=flashcard, collection=flashcardcollection, overall_sum=overall_sum, overall_len=overall_len, seen=seen, time_left=time_left, leaderboards=leaderboards)
@@ -411,7 +415,7 @@ def submit(id, set_id):
         current_user.feedback_3 = feedback
 
     if set_id == 4:
-        if field1 == '' or field2 == '' or field3 == '' or field4 == '' or field5 == '' or field6 == '' or field7 == '' or field8 == '':
+        if spec == '' or field1 == '' or field2 == '' or field3 == '' or field4 == '' or field5 == '' or field6 == '' or field7 == '' or field8 == '':
             return redirect(url_for('.questions', id=id, cycle=1, set_id=set_id))
         else:
             return redirect(url_for('.pause', id=id, start=0, ready=1, set_id=set_id))
