@@ -172,12 +172,12 @@ def learn(id, current):
     conn = sqlite3.connect(sqlite_file)
     c = conn.cursor()
 
-    for row in c.execute("SELECT rowid, * FROM users ORDER BY id"):
+    for row in c.execute("SELECT rowid, * FROM users"):
         user_ids.append(row[3])
         score.append(row[-9])
 
     pre_dict = dict(zip(user_ids, score))
-    leaderboards = dict(reversed(sorted(pre_dict.items(), key=operator.itemgetter(1))))
+    leaderboards = dict(reversed(sorted(pre_dict.items(), key=lambda x:x[1])))
 
     #temp vars
     total_repetitions = SESSION_LENGTH*REP_PER_MIN
@@ -332,9 +332,11 @@ def learn(id, current):
         if flashcard_generated[i+1] > 0:
             seen += 1
 
-    time_left = round(SESSION_LENGTH - current_user.total_reps/7,2)
+    time_left = SESSION_LENGTH - current_user.total_reps/7
     if current_user.total_reps/7 < SESSION_LENGTH/2:
         time_left -= 15
+
+    time_left = round(time_left,2)
 
     if flashcard.history == '' and flashcard.pre_answer != 1:
         return render_template('pretest.html', flashcard=flashcard, collection=flashcardcollection, overall_sum=overall_sum, overall_len=overall_len, seen=seen, time_left=time_left, leaderboards=leaderboards)
@@ -442,16 +444,16 @@ def consent(id):
 def realtime():
     sqlite_file = 'data-dev.sqlite'
     user_ids = []
-    started = []
+    values = []
 
     conn = sqlite3.connect(sqlite_file)
     c = conn.cursor()
 
-    for row in c.execute("SELECT rowid, * FROM users ORDER BY id"):
+    for row in c.execute("SELECT rowid, * FROM users"):
         user_ids.append(row[3])
-        started.append(row[-2])
+        values.append(str(row[-2]) + ',' + str(row[-9]) + ',' + str(row[-11]))
 
-    ls = dict(zip(user_ids, started))
+    ls = dict(zip(user_ids, values))
     return render_template('realtime.html', ls=ls)
 
 @main.route('/flashcardcollection/<int:id>/reset-cards')

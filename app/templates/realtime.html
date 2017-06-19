@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base2.html" %}
 
 {% block title %}consent{% endblock %}
 
@@ -7,7 +7,11 @@
     <h1>realtime check</h1> <br/>
     <p style="font-size:15px">
         {% for key in ls.keys() %}
-          <b>{{key}}</b> - {% if ls[key] == 0 %}<b class="red">Not started</b>{% else %}<b class="green">Started</b>{% endif %}<br />
+          <b>{{key}}</b> - {% if ls[key].split(',')[0] == '0' %}<b class="red">Not started</b>{% else %}<b class="green">Started</b>{% endif %} - {{ls[key].split(',')[1]}}
+          <div class="progress" style="margin:0; padding:0">
+            <div class="progress-bar" role="progressbar" aria-valuenow="{{(ls[key].split(',')[2]|int/210)*100}}" aria-valuemin="0" aria-valuemax="100" style="width:{{(ls[key].split(',')[2]|int/210)*100}}%"></div>
+          </div>
+          <br/>
         {% endfor %}
     </p>
 
