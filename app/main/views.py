@@ -438,6 +438,22 @@ def pause(id, start, ready,set_id):
 def consent(id):
     return render_template('consent.html', id=id)
 
+@main.route('/realtime')
+def realtime():
+    sqlite_file = 'data-dev.sqlite'
+    user_ids = []
+    started = []
+
+    conn = sqlite3.connect(sqlite_file)
+    c = conn.cursor()
+
+    for row in c.execute("SELECT rowid, * FROM users ORDER BY id"):
+        user_ids.append(row[3])
+        started.append(row[-2])
+
+    ls = dict(zip(user_ids, started))
+    return render_template('realtime.html', ls=ls)
+
 @main.route('/flashcardcollection/<int:id>/reset-cards')
 @login_required
 def reset_cards(id):

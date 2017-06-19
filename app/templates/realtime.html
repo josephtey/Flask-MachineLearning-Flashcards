@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}consent{% endblock %}
+
+{% block page_content %}
+
+    <h1>realtime check</h1> <br/>
+    <p style="font-size:15px">
+        {% for key in ls.keys() %}
+          <b>{{key}}</b> - {% if ls[key] == 0 %}<b class="red">Not started</b>{% else %}<b class="green">Started</b>{% endif %}<br />
+        {% endfor %}
+    </p>
+
+    <script type="text/javascript">
+    setTimeout(function(){
+     window.location.reload(1);
+    }, 5000);
+    </script>
+
+{% endblock %}
