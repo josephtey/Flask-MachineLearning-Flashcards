@@ -20,7 +20,7 @@ import operator
 from random import randint
 
 #correct, wrong, exponential, intercept/bias
-WEIGHTS = [1.31889574, -0.46632819,  3.63402041, 6.61932582385]
+WEIGHTS = [-1.31889574, -0.46632819,  3.63402041, 6.61932582385]
 
 #mins
 SESSION_LENGTH = 30
