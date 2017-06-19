@@ -303,20 +303,20 @@ def learn(id, current):
                     flashcard = flashcards[index-1]
             else:
                 #massed grouped design
-                if flashcards.index(flashcards[current_user.last_index]) == 14 and current_user.sequential_cycle < 7:
-                    current_user.sequential_cycle += 1
-                    flashcard = flashcards[0]
-                elif flashcards.index(flashcards[current_user.last_index]) == 29 and current_user.sequential_cycle < 14 and current_user.sequential_cycle >= 7:
-                    current_user.sequential_cycle += 1
-                    flashcard = flashcards[14]
-                else:
-                    flashcard = flashcards[current_user.last_index+1]
-
-                #sequential design
-                # if current_user.last_index == len(flashcards)-1:
-                #     flashcard  = flashcards[0]
+                # if flashcards.index(flashcards[current_user.last_index]) == 14 and current_user.sequential_cycle < 7:
+                #     current_user.sequential_cycle += 1
+                #     flashcard = flashcards[0]
+                # elif flashcards.index(flashcards[current_user.last_index]) == 29 and current_user.sequential_cycle < 14 and current_user.sequential_cycle >= 7:
+                #     current_user.sequential_cycle += 1
+                #     flashcard = flashcards[14]
                 # else:
                 #     flashcard = flashcards[current_user.last_index+1]
+
+                #sequential design
+                if current_user.last_index == len(flashcards)-1:
+                    flashcard  = flashcards[0]
+                else:
+                    flashcard = flashcards[current_user.last_index+1]
     else:
         flashcard = Flashcard.query.get_or_404(current)
 
