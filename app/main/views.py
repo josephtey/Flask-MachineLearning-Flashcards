@@ -333,8 +333,8 @@ def learn(id, current):
             seen += 1
 
     time_left = SESSION_LENGTH - current_user.total_reps/7
-    if current_user.total_reps/7 < SESSION_LENGTH/2:
-        time_left -= 15
+    # if current_user.total_reps/7 < SESSION_LENGTH/2:
+    #     time_left -= 15
 
     time_left = round(time_left,2)
 
@@ -404,8 +404,7 @@ def submit(id, set_id):
         field5 = request.args.get('field5')
         field6 = request.args.get('field6')
         field7 = request.args.get('field7')
-        field8 = request.args.get('field8')
-        feedback = spec + ',' + field1 + ',' + field2 + ',' + field3 + ',' + field4 + ',' + field5 + ',' + field6 + ',' + field7 + ',' + field8
+        feedback = spec + ',' + field1 + ',' + field2 + ',' + field3 + ',' + field4 + ',' + field5 + ',' + field6 + ',' + field7
     else:
         feedback = field1
 
@@ -417,7 +416,7 @@ def submit(id, set_id):
         current_user.feedback_3 = feedback
 
     if set_id == 4:
-        if spec == '' or field1 == '' or field2 == '' or field3 == '' or field4 == '' or field5 == '' or field6 == '' or field7 == '' or field8 == '':
+        if spec == '' or field1 == '' or field2 == '' or field3 == '' or field4 == '' or field5 == '' or field6 == '' or field7 == '':
             return redirect(url_for('.questions', id=id, cycle=1, set_id=set_id))
         else:
             return redirect(url_for('.pause', id=id, start=0, ready=1, set_id=set_id))
@@ -533,7 +532,7 @@ def wrong_answer(collId, cardId, duration):
     if flashcard.last_strength != 0:
         flashcard.last_strength -= 1
     current_user.total_reps += 1
-    current_user.score = max(0, current_user.score - 1)
+    current_user.score += 1
     flashcard.last_time = current_time
     db.session.add(flashcard)
     db.session.commit()
@@ -573,7 +572,7 @@ def right_answer(collId, cardId, duration):
 
     flashcard.last_strength += 1
     current_user.total_reps += 1
-    current_user.score += 1
+    current_user.score += 3
     flashcard.last_time = current_time
     db.session.add(flashcard)
     db.session.commit()
