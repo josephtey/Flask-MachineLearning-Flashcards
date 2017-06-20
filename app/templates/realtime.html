@@ -8,7 +8,7 @@
 
             <div class="row">
               <div class="col-sm-6">
-                <b style="font-size: 15px">{{key}}</b>{% if ls[key].split(',')[0] == '0' %} - <b class="red">Not started</b>{% else %}<b class="green">Started</b>{% endif %} - Score - {{ls[key].split(',')[1]}} - Trials - {{ls[key].split(',')[2]}}
+                <b style="font-size: 15px">{{key}}</b>{% if ls[key].split(',')[0] == '0' %} - <b class="red">Not started</b>{% else %} - <b class="green">Started</b>{% endif %} - Score - {{ls[key].split(',')[1]}} - Trials - {{ls[key].split(',')[2]}}
               </div>
               <div class="col-sm-6">
                 <div class="progress" style="margin-bottom:0">
