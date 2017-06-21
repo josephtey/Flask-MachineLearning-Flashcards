@@ -249,7 +249,7 @@ def learn(id, current):
                 #scale the features
                 scaled_correct = math.sqrt(1.0+correct)
                 scaled_wrong = math.sqrt(1.0 + wrong)
-                scaled_expo = math.sqrt(1.0 + expo)
+                scaled_expo = expo
                 h_power = (scaled_correct*WEIGHTS[0])+(scaled_wrong*WEIGHTS[1])+(scaled_expo*WEIGHTS[2])+WEIGHTS[3]
                 h = hclip(math.pow(2, h_power))
                 p = pclip(math.pow(2, (-time_elapsed)/h))
