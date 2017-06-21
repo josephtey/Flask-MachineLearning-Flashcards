@@ -455,6 +455,22 @@ def realtime():
     ls = dict(zip(user_ids, values))
     return render_template('realtime.html', ls=ls)
 
+@main.route('/realtime2')
+def realtime2():
+    sqlite_file = 'data-dev.sqlite'
+    user_ids = []
+    values = []
+
+    conn = sqlite3.connect(sqlite_file)
+    c = conn.cursor()
+
+    for row in c.execute("SELECT rowid, * FROM users"):
+        user_ids.append(row[3])
+        values.append(str(row[-2]) + ',' + str(row[-9]) + ',' + str(row[-11]))
+
+    ls = dict(zip(user_ids, values))
+    return render_template('realtime2.html', ls=ls)
+
 @main.route('/flashcardcollection/<int:id>/reset-cards')
 @login_required
 def reset_cards(id):
