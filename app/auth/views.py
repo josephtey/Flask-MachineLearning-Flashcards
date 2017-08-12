@@ -58,7 +58,7 @@ def register():
         #token = user.generate_confirmation_token()
         #send_email(user.email, 'Confirm Your Account', 'auth/email/confirm', user=user, token=token)
 
-        python3_command = "python2 import.py japanese.csv -user_id 2 -user_schedulers " + user.scheduler_order
+        python3_command = "python2 import.py lesson10.csv -user_id 2 -user_schedulers " + user.scheduler_order
         process = subprocess.Popen(python3_command.split(), stdout=subprocess.PIPE)
         output, error = process.communicate()
 

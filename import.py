@@ -30,7 +30,7 @@ for row in c.execute("SELECT rowid, * FROM flashcard ORDER BY id"):
 	last_collection = row[6]
 	last_id = row[0]
 
-c.execute("INSERT INTO flashcardcollection VALUES('" + str(int(last_collection)+1) +"', 'Japanese', '1000-01-01 00:00:00', " + str(int(last_collection)+1) + ")")
+c.execute("INSERT INTO flashcardcollection VALUES('" + str(int(last_collection)+1) +"', 'Lesson 10', '1000-01-01 00:00:00', " + str(int(last_collection)+1) + ")")
 
 indexes = range(len(items))
 num_per_scheduler = int(round(len(items)/DESIGN))
