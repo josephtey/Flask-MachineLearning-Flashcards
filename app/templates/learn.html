@@ -32,7 +32,8 @@
                           <p>There is a {{chance}}% chance you will remember this</p>
                       {% endif %}
                   </span>
-                  <p>{{ flashcard.question }}</p>
+                  <!-- hide answer... -->
+                  <!-- <p>{{ flashcard.question }}</p> -->
                 </div>
 
               </div>
@@ -88,7 +89,7 @@
             var answer = key
         console.log(answer)
         responsiveVoice.speak(answer, "Chinese Female", {rate: 0.7});
-        
+
         var elem = document.getElementById("my-stopwatch");
         var timer = new Stopwatch(elem, {delay: 10});
 
