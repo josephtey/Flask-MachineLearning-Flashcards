@@ -162,7 +162,7 @@ def learn(id, current):
 
     #important vars
     flashcardcollection = FlashcardCollection.query.get_or_404(id)
-    all_flashcards = flashcardcollection.flashcards.all()
+    flashcards = flashcardcollection.flashcards.all()
     mode = request.args.get('mode')
 
     sqlite_file = 'data-dev.sqlite'
