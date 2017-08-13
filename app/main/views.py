@@ -162,8 +162,17 @@ def learn(id, current):
 
     #important vars
     flashcardcollection = FlashcardCollection.query.get_or_404(id)
-    flashcards = flashcardcollection.flashcards.all()
+    all_flashcards = flashcardcollection.flashcards.all()
     mode = request.args.get('mode')
+
+    if mode == 'normal':
+        flashcards = all_flashcards
+    elif mode == 'unlearned':
+        flashcards = []
+        for i in range(len(all_flashcards)):
+            if len(all_flashcards[i].history.split(',')) <= 3:
+                flashcards.append(all_flashcards[i])
+        
 
     sqlite_file = 'data-dev.sqlite'
     user_ids = []

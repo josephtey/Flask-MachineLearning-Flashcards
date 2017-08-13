@@ -4,35 +4,10 @@
 
 {% block page_content %}
 
-    <h1>consent</h1> <br/>
-    <b style="font-size:20px"> if you are on PRIVATE BROWSING MODE, please switch off; it will not work otherwise</b> <br/><br>
-    <p style="font-size:15px">
-      <b style="font-size:20px">What is this?</b> <br>
-      My name is Joseph Tey, and I am a Year 10 student currently undertaking a VCE 3/4 subject known as Extended Investigation. For my research, I have created a flashcard website that helps students to memorise vocabulary words more efficiently. This experiment, aims to test the effectiveness of the website.
-      <br><br>
-      To ensure quality data, I would greatly appreciate it if you could follow the instructions below, and actively participate during this short experiment.
-      <br><br>
-      <b style="font-size:20px">Why should I do this?</b> <br>
-      <ol style="font-size:15px">
-        <li>If you're unsure of effective ways to memorise vocabulary, this may help.</li>
-        <li>A <b>TEST</b> will be conducted tomorrow; this is your only opportunity to revise for the test.</li>
-      </ol><br>
+    <h1>what do you want to do?</h1> <br/>
 
-      <b style="font-size:20px">Before you start...</b> <br />
+    <a class="btn" style="margin-top:10px;padding:10px 20px; border:1px solid #aaaaaa; color:#aaaaaa;font-size:15px; font-weight:normal" href="{{ url_for('.learn', id=id, current=0, mode='normal') }}">learn all words</a>
 
-      As certain times, you may feel demotivated or stressed out. If this happens, please continue to try your best – the experiment is designed to be deliberately difficult.
-<br><br>
-
-      <b style="font-size:20px">Agreements</b> <br><br>
-      By clicking 'begin', you agree to the following terms:<br>
-      <ol style="font-size:15px">
-        <li>The use of your anonymous responses for analysis and collection only by the conductor of this study; Joseph Tey.</li>
-        <li>Sharing of anonymous results, through presentations, between assessment authorities, such as VCAA, peers and teachers.</li>
-      </ol>
-      <br>
-
-      <p style="font-size:15px">If you wish to ask any questions, please contact Joseph Tey via email: S1032319@haileybury.vic.edu.au</p>
-    </p>
-    <a class="btn" style="margin-top:10px;padding:10px 20px; border:1px solid #aaaaaa; color:#aaaaaa;font-size:15px; font-weight:normal" href="{{ url_for('.learn', id=id, current=0, mode='normal') }}">Begin the experiment!</a>
+    <a class="btn" style="margin-top:10px;padding:10px 20px; border:1px solid #aaaaaa; color:#aaaaaa;font-size:15px; font-weight:normal" href="{{ url_for('.learn', id=id, current=0, mode='unlearned') }}">learn unlearned words</a>
 
 {% endblock %}
