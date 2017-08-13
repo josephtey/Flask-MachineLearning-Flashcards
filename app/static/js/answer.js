@@ -158,7 +158,7 @@ var Stopwatch = function(elem, options) {
   function update() {
     clock += delta();
     render();
-    if (timer.innerText == '25'){
+    if (timer.innerText == '35'){
       showAnswer();
     }
   }
