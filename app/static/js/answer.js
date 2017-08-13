@@ -58,7 +58,7 @@ function showAnswer() {
     user_response = response.value.replace(/\s/g,'');
 
     if (answer.style.display != 'block'){
-      if (ld(ans.toUpperCase(), user_response.toUpperCase()) <= 2) {
+      if (ld(ans.toUpperCase(), user_response.toUpperCase()) == 0) {
           // right_answer.style.display = 'block';
           answer_txt.className += ' green';
           localStorage.setItem('outcome', true)
@@ -158,7 +158,7 @@ var Stopwatch = function(elem, options) {
   function update() {
     clock += delta();
     render();
-    if (timer.innerText == '15'){
+    if (timer.innerText == '25'){
       showAnswer();
     }
   }
@@ -235,7 +235,7 @@ var SecondStopwatch = function(elem, options) {
   function update() {
     clock += delta();
     render();
-    if (timer.innerText == '5'){
+    if (timer.innerText == '8'){
       document.getElementById('next').click();
     }
   }
