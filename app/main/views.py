@@ -561,7 +561,7 @@ def wrong_answer(collId, cardId, duration):
     flashcard.last_time = current_time
     db.session.add(flashcard)
     db.session.commit()
-    return redirect(url_for('.learn', id=collId, current=0, mode='normal'))
+    return redirect(url_for('.learn', id=collId, current=0, mode='unlearned'))
 
 @main.route('/flashcardcollection/<int:collId>/learn/<int:cardId>/right/<int:duration>')
 @login_required
@@ -601,7 +601,7 @@ def right_answer(collId, cardId, duration):
     flashcard.last_time = current_time
     db.session.add(flashcard)
     db.session.commit()
-    return redirect(url_for('.learn', id=collId, current=0, mode='normal'))
+    return redirect(url_for('.learn', id=collId, current=0, mode='unlearned'))
 
 @main.route('/flashcardcollection/<int:collId>/test/<int:cardId>/wrong/<int:duration>')
 @login_required
