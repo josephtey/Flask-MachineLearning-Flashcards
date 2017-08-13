@@ -59,14 +59,14 @@
 
 
     <script src="{{ url_for('static', filename='js/answer.js') }}"></script>
-    <!-- <script src='https://code.responsivevoice.org/responsivevoice.js'></script> -->
+    <script src='https://code.responsivevoice.org/responsivevoice.js'></script>
 
     <script type="text/javascript">
-        // var obj = { {{flashcard.answer}} : 'John' };
-        // for(key in obj)
-        //     var answer = key
-        // console.log(answer)
-        // responsiveVoice.speak(answer, "Chinese Female", {rate: 0.7});
+        var obj = { {{flashcard.answer}} : 'John' };
+        for(key in obj)
+            var answer = key
+        console.log(answer)
+        responsiveVoice.speak(answer, "Chinese Female", {rate: 0.7});
 
         var elem = document.getElementById("my-stopwatch");
         var timer = new SecondStopwatch(elem, {delay: 10});
