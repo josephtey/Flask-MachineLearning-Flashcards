@@ -186,36 +186,36 @@ def learn(id, current):
     repetitions_per_scheduler = round(total_repetitions/DESIGN)
 
     #set scheduler
-    if current_user.total_reps < repetitions_per_scheduler:
-        if current_user.total_reps == 0 and current_user.set_num == 1:
-            return redirect(url_for('.pause', id=id, start=1, ready=1, set_id = 1))
-        else:
-            scheduler = schedulers[0]
-    elif current_user.total_reps >= repetitions_per_scheduler and current_user.total_reps < (2*repetitions_per_scheduler):
-        if current_user.total_reps == repetitions_per_scheduler and current_user.set_num == 2:
-            return redirect(url_for('.questions', id=id, set_id=2, cycle=0))
-        else:
-            scheduler = schedulers[1]
-    elif current_user.total_reps >= (2*repetitions_per_scheduler) and current_user.total_reps < (3*repetitions_per_scheduler) and DESIGN == 3:
-        if current_user.total_reps == (2*repetitions_per_scheduler) and current_user.set_num == 3:
-            return redirect(url_for('.questions', id=id, set_id=3, cycle=0))
-        else:
-            scheduler = schedulers[2]
-    else:
-        return redirect(url_for('.questions', id=flashcardcollection.id, set_id=4, cycle=0))
+    # if current_user.total_reps < repetitions_per_scheduler:
+    #     if current_user.total_reps == 0 and current_user.set_num == 1:
+    #         return redirect(url_for('.pause', id=id, start=1, ready=1, set_id = 1))
+    #     else:
+    #         scheduler = schedulers[0]
+    # elif current_user.total_reps >= repetitions_per_scheduler and current_user.total_reps < (2*repetitions_per_scheduler):
+    #     if current_user.total_reps == repetitions_per_scheduler and current_user.set_num == 2:
+    #         return redirect(url_for('.questions', id=id, set_id=2, cycle=0))
+    #     else:
+    #         scheduler = schedulers[1]
+    # elif current_user.total_reps >= (2*repetitions_per_scheduler) and current_user.total_reps < (3*repetitions_per_scheduler) and DESIGN == 3:
+    #     if current_user.total_reps == (2*repetitions_per_scheduler) and current_user.set_num == 3:
+    #         return redirect(url_for('.questions', id=id, set_id=3, cycle=0))
+    #     else:
+    #         scheduler = schedulers[2]
+    # else:
+    #     return redirect(url_for('.questions', id=flashcardcollection.id, set_id=4, cycle=0))
 
 
     #get words for specific scheduler
-    flashcards = []
-    for i in range(len(all_flashcards)):
-        if scheduler == schedulers[0] and all_flashcards[i].scheduler == schedulers[0]:
-            flashcards.append(all_flashcards[i])
-        elif scheduler == schedulers[1] and all_flashcards[i].scheduler == schedulers[1]:
-            flashcards.append(all_flashcards[i])
-        else:
-            if DESIGN == 3:
-                if scheduler == schedulers[2] and all_flashcards[i].scheduler == schedulers[2]:
-                    flashcards.append(all_flashcards[i])
+    # flashcards = []
+    # for i in range(len(all_flashcards)):
+    #     if scheduler == schedulers[0] and all_flashcards[i].scheduler == schedulers[0]:
+    #         flashcards.append(all_flashcards[i])
+    #     elif scheduler == schedulers[1] and all_flashcards[i].scheduler == schedulers[1]:
+    #         flashcards.append(all_flashcards[i])
+    #     else:
+    #         if DESIGN == 3:
+    #             if scheduler == schedulers[2] and all_flashcards[i].scheduler == schedulers[2]:
+    #                 flashcards.append(all_flashcards[i])
 
     #debug
     print('scheduler: ' + str(scheduler))
