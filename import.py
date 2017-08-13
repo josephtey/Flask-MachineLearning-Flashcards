@@ -30,7 +30,7 @@ for row in c.execute("SELECT rowid, * FROM flashcard ORDER BY id"):
 	last_collection = row[6]
 	last_id = row[0]
 
-c.execute("INSERT INTO flashcardcollection VALUES('" + str(int(last_collection)+1) +"', 'Lesson 10', '1000-01-01 00:00:00', " + str(int(last_collection)+1) + ")")
+c.execute("INSERT INTO flashcardcollection VALUES('" + str(int(last_collection)+1) +"', 'Lesson 11', '1000-01-01 00:00:00', " + str(user_id) + ")")
 
 indexes = range(len(items))
 num_per_scheduler = int(round(len(items)/DESIGN))
@@ -45,14 +45,10 @@ if DESIGN == 3:
 elif DESIGN == 2:
 	schedulers = ([s[0]]*num_per_scheduler) + ([s[1]]*num_per_scheduler)
 
-randomised = {}
-for i in range(len(indexes)):
-	randomised[i] = schedulers[i]
-print randomised
 
 for i in range(len(items)):
 	index = i+last_id
-	row = "'" + str(index+1) + "','" + str(items[i][1]) + "','<p>" + str(items[i][1]) + "</p>','" + str(items[i][0]) + "','<p>" + str(items[i][0]) + "</p>','" + str(int(last_collection)+1) + "', '', '', '', '', '','" + str(randomised[i]) + "',-1,-1,0,'','',0"
+	row = "'" + str(index+1) + "','" + str(items[i][1]) + "','<p>" + str(items[i][1]) + "</p>','" + str(items[i][0]) + "','<p>" + str(items[i][0]) + "</p>','" + str(int(last_collection)+1) + "', '', '', '', '', '','',-1,-1,0,'','',0"
 	print row
 	c.execute("INSERT INTO flashcard VALUES(" + row + ")")
 
