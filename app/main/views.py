@@ -333,7 +333,7 @@ def learn(id, current):
     current_user.last_time = int(datetime.datetime.now().strftime('%s'))
     flashcard.start_learn_time = int(datetime.datetime.now().strftime('%s'))
 
-    chance = round(round(flashcard_generated[flashcards.index(flashcard)+1],2)*100)-11
+    chance = round(round(flashcard_generated[flashcards.index(flashcard)+1],2)*100)
     overall_sum = sum(flashcard_generated.values())
     overall_len = len(flashcard_generated.values())
     seen = 0
