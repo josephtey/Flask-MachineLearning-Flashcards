@@ -612,7 +612,7 @@ def test_wrong(collId, cardId, duration):
 
     db.session.add(flashcard)
     db.session.commit()
-    return redirect(url_for('.test', id=collId, mode='normal'))
+    return redirect(url_for('.test', id=collId, mode=request.args.get('mode')))
 
 @main.route('/flashcardcollection/<int:collId>/test/<int:cardId>/right/<int:duration>')
 @login_required
@@ -623,7 +623,7 @@ def test_right(collId, cardId, duration):
 
     db.session.add(flashcard)
     db.session.commit()
-    return redirect(url_for('.test', id=collId, mode='normal'))
+    return redirect(url_for('.test', id=collId, mode=request.args.get('mode')))
 
 @main.route('/flashcardcollection/<int:collId>/test/<int:cardId>/next')
 @login_required
@@ -635,4 +635,4 @@ def next(collId, cardId):
 
     db.session.add(flashcard)
     db.session.commit()
-    return redirect(url_for('.learn', id=collId, current=cardId, mode='normal'))
+    return redirect(url_for('.learn', id=collId, current=cardId, mode=request.args.get('mode')))
