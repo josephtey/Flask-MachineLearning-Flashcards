@@ -170,7 +170,7 @@ def learn(id, current):
     elif mode == 'unlearned':
         flashcards = []
         for i in range(len(all_flashcards)):
-            if len(all_flashcards[i].history.split(',')) <= 3:
+            if Counter(all_flashcards[i].history.split(','))['1'] >= 5:
                 flashcards.append(all_flashcards[i])
         
 
@@ -561,7 +561,7 @@ def wrong_answer(collId, cardId, duration):
     flashcard.last_time = current_time
     db.session.add(flashcard)
     db.session.commit()
-    return redirect(url_for('.learn', id=collId, current=0, mode='unlearned'))
+    return redirect(url_for('.learn', id=collId, current=0, mode=request.args.get('mode')))
 
 @main.route('/flashcardcollection/<int:collId>/learn/<int:cardId>/right/<int:duration>')
 @login_required
@@ -601,7 +601,7 @@ def right_answer(collId, cardId, duration):
     flashcard.last_time = current_time
     db.session.add(flashcard)
     db.session.commit()
-    return redirect(url_for('.learn', id=collId, current=0, mode='unlearned'))
+    return redirect(url_for('.learn', id=collId, current=0, mode=request.args.get('mode')))
 
 @main.route('/flashcardcollection/<int:collId>/test/<int:cardId>/wrong/<int:duration>')
 @login_required
