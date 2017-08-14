@@ -170,7 +170,7 @@ def learn(id, current):
     elif mode == 'unlearned':
         flashcards = []
         for i in range(len(all_flashcards)):
-            if Counter(all_flashcards[i].history.split(','))['1'] >= 5:
+            if Counter(all_flashcards[i].history.split(','))['1'] < 5:
                 flashcards.append(all_flashcards[i])
         
 
