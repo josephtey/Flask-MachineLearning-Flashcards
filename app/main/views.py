@@ -164,6 +164,7 @@ def learn(id, current):
     flashcardcollection = FlashcardCollection.query.get_or_404(id)
     all_flashcards = flashcardcollection.flashcards.all()
     mode = request.args.get('mode')
+    scheduler = 1
 
     if mode == 'normal':
         flashcards = all_flashcards
@@ -172,6 +173,9 @@ def learn(id, current):
         for i in range(len(all_flashcards)):
             if Counter(all_flashcards[i].history.split(','))['1'] < 5:
                 flashcards.append(all_flashcards[i])
+    elif mode == 'test':
+        flashcards = all_flashcards
+        scheduler = 3
         
 
     sqlite_file = 'data-dev.sqlite'
@@ -190,7 +194,6 @@ def learn(id, current):
 
     #temp vars
     total_repetitions = SESSION_LENGTH*REP_PER_MIN
-    scheduler = 1
     schedulers = [int(i) for i in current_user.scheduler_order.split(',')]
     repetitions_per_scheduler = round(total_repetitions/DESIGN)
 
