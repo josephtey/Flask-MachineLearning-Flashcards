@@ -1,3 +1,5 @@
+#Script to import files
+
 import sqlite3
 import csv
 import argparse
