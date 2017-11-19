@@ -3,8 +3,8 @@
 {% block title %}Flashcard - Learning Collection {{ name }}{% endblock %}
 
 {% block page_content %}
-    <!-- <p style="font-size: 20px; font-family: helvetica; text-align: center">Time left: {{time_left}} minutes<p> -->
-      <!-- <div class="panel panel-default" style="float:left; position:absolute">
+    <p style="font-size: 20px; font-family: helvetica; text-align: center">Time left: {{time_left}} minutes<p>
+      <div class="panel panel-default" style="float:left; position:absolute">
         <div class="panel-body">
           <b>Leaderboards</b> <br></br>
           <ol style="text-align: left; margin: 0; padding-left:19px">
@@ -17,7 +17,7 @@
             {% endfor %}
           </ol>
         </div>
-      </div> -->
+      </div>
     <div class="learn_word_outer">
           <div class="learn_word_inner">
               <div>
@@ -32,8 +32,7 @@
                           <p>There is a {{chance}}% chance you will remember this</p>
                       {% endif %}
                   </span>
-                  <!-- hide answer... -->
-                  <!-- <p>{{ flashcard.question }}</p> -->
+                  <p>{{ flashcard.question }}</p>
                 </div>
 
               </div>
@@ -80,16 +79,9 @@
     <script src="{{ url_for('static', filename='js/answer.js') }}"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
-    <script src='https://code.responsivevoice.org/responsivevoice.js'></script>
+    <!-- <script src='https://code.responsivevoice.org/responsivevoice.js'></script> -->
 
     <script type="text/javascript">
-
-        var obj = { {{flashcard.answer}} : 'John' };
-        for(key in obj)
-            var answer = key
-        console.log(answer)
-        responsiveVoice.speak(answer, "Chinese Female", {rate: 0.7});
-
         var elem = document.getElementById("my-stopwatch");
         var timer = new Stopwatch(elem, {delay: 10});
 

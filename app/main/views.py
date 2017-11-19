@@ -164,19 +164,6 @@ def learn(id, current):
     flashcardcollection = FlashcardCollection.query.get_or_404(id)
     all_flashcards = flashcardcollection.flashcards.all()
     mode = request.args.get('mode')
-    scheduler = 1
-
-    if mode == 'normal':
-        flashcards = all_flashcards
-    elif mode == 'unlearned':
-        flashcards = []
-        for i in range(len(all_flashcards)):
-            if Counter(all_flashcards[i].history.split(','))['1'] < 5:
-                flashcards.append(all_flashcards[i])
-    elif mode == 'test':
-        flashcards = all_flashcards
-        scheduler = 3
-        
 
     sqlite_file = 'data-dev.sqlite'
     user_ids = []
@@ -194,40 +181,41 @@ def learn(id, current):
 
     #temp vars
     total_repetitions = SESSION_LENGTH*REP_PER_MIN
+    scheduler = 1
     schedulers = [int(i) for i in current_user.scheduler_order.split(',')]
     repetitions_per_scheduler = round(total_repetitions/DESIGN)
 
     #set scheduler
-    # if current_user.total_reps < repetitions_per_scheduler:
-    #     if current_user.total_reps == 0 and current_user.set_num == 1:
-    #         return redirect(url_for('.pause', id=id, start=1, ready=1, set_id = 1))
-    #     else:
-    #         scheduler = schedulers[0]
-    # elif current_user.total_reps >= repetitions_per_scheduler and current_user.total_reps < (2*repetitions_per_scheduler):
-    #     if current_user.total_reps == repetitions_per_scheduler and current_user.set_num == 2:
-    #         return redirect(url_for('.questions', id=id, set_id=2, cycle=0))
-    #     else:
-    #         scheduler = schedulers[1]
-    # elif current_user.total_reps >= (2*repetitions_per_scheduler) and current_user.total_reps < (3*repetitions_per_scheduler) and DESIGN == 3:
-    #     if current_user.total_reps == (2*repetitions_per_scheduler) and current_user.set_num == 3:
-    #         return redirect(url_for('.questions', id=id, set_id=3, cycle=0))
-    #     else:
-    #         scheduler = schedulers[2]
-    # else:
-    #     return redirect(url_for('.questions', id=flashcardcollection.id, set_id=4, cycle=0))
+    if current_user.total_reps < repetitions_per_scheduler:
+        if current_user.total_reps == 0 and current_user.set_num == 1:
+            return redirect(url_for('.pause', id=id, start=1, ready=1, set_id = 1))
+        else:
+            scheduler = schedulers[0]
+    elif current_user.total_reps >= repetitions_per_scheduler and current_user.total_reps < (2*repetitions_per_scheduler):
+        if current_user.total_reps == repetitions_per_scheduler and current_user.set_num == 2:
+            return redirect(url_for('.questions', id=id, set_id=2, cycle=0))
+        else:
+            scheduler = schedulers[1]
+    elif current_user.total_reps >= (2*repetitions_per_scheduler) and current_user.total_reps < (3*repetitions_per_scheduler) and DESIGN == 3:
+        if current_user.total_reps == (2*repetitions_per_scheduler) and current_user.set_num == 3:
+            return redirect(url_for('.questions', id=id, set_id=3, cycle=0))
+        else:
+            scheduler = schedulers[2]
+    else:
+        return redirect(url_for('.questions', id=flashcardcollection.id, set_id=4, cycle=0))
 
 
     #get words for specific scheduler
-    # flashcards = []
-    # for i in range(len(all_flashcards)):
-    #     if scheduler == schedulers[0] and all_flashcards[i].scheduler == schedulers[0]:
-    #         flashcards.append(all_flashcards[i])
-    #     elif scheduler == schedulers[1] and all_flashcards[i].scheduler == schedulers[1]:
-    #         flashcards.append(all_flashcards[i])
-    #     else:
-    #         if DESIGN == 3:
-    #             if scheduler == schedulers[2] and all_flashcards[i].scheduler == schedulers[2]:
-    #                 flashcards.append(all_flashcards[i])
+    flashcards = []
+    for i in range(len(all_flashcards)):
+        if scheduler == schedulers[0] and all_flashcards[i].scheduler == schedulers[0]:
+            flashcards.append(all_flashcards[i])
+        elif scheduler == schedulers[1] and all_flashcards[i].scheduler == schedulers[1]:
+            flashcards.append(all_flashcards[i])
+        else:
+            if DESIGN == 3:
+                if scheduler == schedulers[2] and all_flashcards[i].scheduler == schedulers[2]:
+                    flashcards.append(all_flashcards[i])
 
     #debug
     print('scheduler: ' + str(scheduler))
@@ -261,7 +249,7 @@ def learn(id, current):
                 #scale the features
                 scaled_correct = math.sqrt(1.0+correct)
                 scaled_wrong = math.sqrt(1.0 + wrong)
-                scaled_expo = expo
+                scaled_expo = math.sqrt(1.0 + expo)
                 h_power = (scaled_correct*WEIGHTS[0])+(scaled_wrong*WEIGHTS[1])+(scaled_expo*WEIGHTS[2])+WEIGHTS[3]
                 h = hclip(math.pow(2, h_power))
                 p = pclip(math.pow(2, (-time_elapsed)/h))
@@ -336,7 +324,7 @@ def learn(id, current):
     current_user.last_time = int(datetime.datetime.now().strftime('%s'))
     flashcard.start_learn_time = int(datetime.datetime.now().strftime('%s'))
 
-    chance = round(round(flashcard_generated[flashcards.index(flashcard)+1],2)*100)
+    chance = round(round(flashcard_generated[flashcards.index(flashcard)+1],2)*100)-11
     overall_sum = sum(flashcard_generated.values())
     overall_len = len(flashcard_generated.values())
     seen = 0
@@ -467,22 +455,6 @@ def realtime():
     ls = dict(zip(user_ids, values))
     return render_template('realtime.html', ls=ls)
 
-@main.route('/realtime2')
-def realtime2():
-    sqlite_file = 'data-dev.sqlite'
-    user_ids = []
-    values = []
-
-    conn = sqlite3.connect(sqlite_file)
-    c = conn.cursor()
-
-    for row in c.execute("SELECT rowid, * FROM users"):
-        user_ids.append(row[3])
-        values.append(str(row[-2]) + ',' + str(row[-9]) + ',' + str(row[-11]))
-
-    ls = dict(zip(user_ids, values))
-    return render_template('realtime2.html', ls=ls)
-
 @main.route('/flashcardcollection/<int:id>/reset-cards')
 @login_required
 def reset_cards(id):
@@ -564,7 +536,7 @@ def wrong_answer(collId, cardId, duration):
     flashcard.last_time = current_time
     db.session.add(flashcard)
     db.session.commit()
-    return redirect(url_for('.learn', id=collId, current=0, mode=request.args.get('mode')))
+    return redirect(url_for('.learn', id=collId, current=0, mode='normal'))
 
 @main.route('/flashcardcollection/<int:collId>/learn/<int:cardId>/right/<int:duration>')
 @login_required
@@ -604,7 +576,7 @@ def right_answer(collId, cardId, duration):
     flashcard.last_time = current_time
     db.session.add(flashcard)
     db.session.commit()
-    return redirect(url_for('.learn', id=collId, current=0, mode=request.args.get('mode')))
+    return redirect(url_for('.learn', id=collId, current=0, mode='normal'))
 
 @main.route('/flashcardcollection/<int:collId>/test/<int:cardId>/wrong/<int:duration>')
 @login_required
@@ -615,7 +587,7 @@ def test_wrong(collId, cardId, duration):
 
     db.session.add(flashcard)
     db.session.commit()
-    return redirect(url_for('.test', id=collId, mode=request.args.get('mode')))
+    return redirect(url_for('.test', id=collId, mode='normal'))
 
 @main.route('/flashcardcollection/<int:collId>/test/<int:cardId>/right/<int:duration>')
 @login_required
@@ -626,7 +598,7 @@ def test_right(collId, cardId, duration):
 
     db.session.add(flashcard)
     db.session.commit()
-    return redirect(url_for('.test', id=collId, mode=request.args.get('mode')))
+    return redirect(url_for('.test', id=collId, mode='normal'))
 
 @main.route('/flashcardcollection/<int:collId>/test/<int:cardId>/next')
 @login_required
@@ -638,4 +610,4 @@ def next(collId, cardId):
 
     db.session.add(flashcard)
     db.session.commit()
-    return redirect(url_for('.learn', id=collId, current=cardId, mode=request.args.get('mode')))
+    return redirect(url_for('.learn', id=collId, current=cardId, mode='normal'))

@@ -5,19 +5,20 @@
 {% block page_content %}
 
         {% for key in ls.keys() %}
-            {% if key == 'user1' or key == 'user2' or key == 'user3' or key == 'user4' or key == 'user5' or key == 'user6' or key == 'user7' or key == 'user8' or key == 'user9' or key == 'user10' %}
+
             <div class="row">
               <div class="col-sm-6">
                 <b style="font-size: 15px">{{key}}</b>{% if ls[key].split(',')[0] == '0' %} - <b class="red">Not started</b>{% else %} - <b class="green">Started</b>{% endif %} - Score - {{ls[key].split(',')[1]}} - Trials - {{ls[key].split(',')[2]}}
               </div>
               <div class="col-sm-6">
-                <div class="progress" style="margin-bottom:0; background:#cccccc">
-                  <div class="progress-bar"role="progressbar" aria-valuenow="{{(ls[key].split(',')[2]|int/210)*100}}" aria-valuemin="0" aria-valuemax="100" style="width:{{(ls[key].split(',')[2]|int/210)*100}}%">progress</div>
+                <div class="progress" style="margin-bottom:0">
+                  <div class="progress-bar"role="progressbar" aria-valuenow="{{(ls[key].split(',')[2]|int/210)*100}}" aria-valuemin="0" aria-valuemax="100" style="width:{{(ls[key].split(',')[2]|int/210)*100}}%"></div>
                 </div>
               </div>
             </div>
-            <br/>
-            {% endif %}
+
+
+          <br/>
         {% endfor %}
 
 
