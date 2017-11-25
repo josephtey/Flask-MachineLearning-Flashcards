@@ -164,7 +164,7 @@ def learn(id, current):
 
     #important vars
     flashcardcollection = FlashcardCollection.query.get_or_404(id)
-    all_flashcards = flashcardcollection.flashcards.all()
+    flashcards = flashcardcollection.flashcards.all()
     mode = request.args.get('mode')
 
     sqlite_file = 'data-dev.sqlite'
@@ -187,41 +187,6 @@ def learn(id, current):
     schedulers = [int(i) for i in current_user.scheduler_order.split(',')]
     repetitions_per_scheduler = round(total_repetitions/DESIGN)
 
-    #set scheduler
-    if current_user.total_reps < repetitions_per_scheduler:
-        if current_user.total_reps == 0 and current_user.set_num == 1:
-            return redirect(url_for('.pause', id=id, start=1, ready=1, set_id = 1))
-        else:
-            scheduler = schedulers[0]
-    elif current_user.total_reps >= repetitions_per_scheduler and current_user.total_reps < (2*repetitions_per_scheduler):
-        if current_user.total_reps == repetitions_per_scheduler and current_user.set_num == 2:
-            return redirect(url_for('.questions', id=id, set_id=2, cycle=0))
-        else:
-            scheduler = schedulers[1]
-    elif current_user.total_reps >= (2*repetitions_per_scheduler) and current_user.total_reps < (3*repetitions_per_scheduler) and DESIGN == 3:
-        if current_user.total_reps == (2*repetitions_per_scheduler) and current_user.set_num == 3:
-            return redirect(url_for('.questions', id=id, set_id=3, cycle=0))
-        else:
-            scheduler = schedulers[2]
-    else:
-        return redirect(url_for('.questions', id=flashcardcollection.id, set_id=4, cycle=0))
-
-
-    #get words for specific scheduler
-    flashcards = []
-    for i in range(len(all_flashcards)):
-        if scheduler == schedulers[0] and all_flashcards[i].scheduler == schedulers[0]:
-            flashcards.append(all_flashcards[i])
-        elif scheduler == schedulers[1] and all_flashcards[i].scheduler == schedulers[1]:
-            flashcards.append(all_flashcards[i])
-        else:
-            if DESIGN == 3:
-                if scheduler == schedulers[2] and all_flashcards[i].scheduler == schedulers[2]:
-                    flashcards.append(all_flashcards[i])
-
-    #debug
-    print('scheduler: ' + str(scheduler))
-    print('total reps: ' + str(current_user.total_reps))
     for i in range(len(flashcards)):
         if flashcards[i].history == '' or flashcards[i].last_time == 0:
             #print(str(i+1))
@@ -234,48 +199,26 @@ def learn(id, current):
             time_elapsed = int(datetime.datetime.now().strftime('%s')) - flashcards[i].last_time
             last_strength = flashcards[i].last_strength
 
-            #machine learning features
-            if scheduler == 1:
+            expo = 0.0
+
+            if (len(history) > 1):
+                for y in range(len(history)):
+                    expo_incre = math.pow(0.8,y)
+                    if list(reversed(history))[y] == 1.0:
+                        expo += expo_incre
+            else:
                 expo = 0.0
 
-                if (len(history) > 1):
-                    for y in range(len(history)):
-                        expo_incre = math.pow(0.8,y)
-                        if list(reversed(history))[y] == 1.0:
-                            expo += expo_incre
-                else:
-                    expo = 0.0
-
-                #scale the features
-                scaled_correct = math.sqrt(1.0+correct)
-                scaled_wrong = math.sqrt(1.0 + wrong)
-                scaled_expo = math.sqrt(1.0 + expo)
-                h_power = (scaled_correct*WEIGHTS[0])+(scaled_wrong*WEIGHTS[1])+(scaled_expo*WEIGHTS[2])+WEIGHTS[3]
-                h = hclip(math.pow(2, h_power))
-                p = pclip(math.pow(2, (-time_elapsed)/h))
-
-            elif scheduler == 2:
-                last_answer = history[-1]
-                last_int = last_strength + 8
-
-                if last_answer == 1:
-                    last_int += 1
-                elif last_answer == 0:
-                    last_int -= 1
-
-                try:
-                    h = hclip(math.pow(2, last_int))
-                except OverflowError:
-                    h = 256800
-
-                p = pclip(math.pow(2, (-time_elapsed)/h))
-            else:
-                p = randint(75,90)/100
+            #scale the features
+            scaled_correct = math.sqrt(1.0+correct)
+            scaled_wrong = math.sqrt(1.0 + wrong)
+            scaled_expo = math.sqrt(1.0 + expo)
+            h_power = (scaled_correct*WEIGHTS[0])+(scaled_wrong*WEIGHTS[1])+(scaled_expo*WEIGHTS[2])+WEIGHTS[3]
+            h = hclip(math.pow(2, h_power))
+            p = pclip(math.pow(2, (-time_elapsed)/h))
 
             #assign probability to array
             flashcard_generated[i+1] = p
-
-    print(flashcard_generated)
 
     learning_cards = copy.copy(flashcard_generated)
     new_cards = copy.copy(flashcard_generated)
@@ -294,29 +237,11 @@ def learn(id, current):
         else:
             index = min(learning_cards, key=learning_cards.get)
             difference = 0.5-learning_cards[index]
-
-            #introduce a word when lowest word percentage is above 90%
-            if scheduler != 3:
-                if difference < -0.4 and len(new_cards) > 0:
-                    flashcard = flashcards[choice(list(new_cards.keys()))-1]
-                else:
-                    flashcard = flashcards[index-1]
+            
+            if difference < -0.4 and len(new_cards) > 0:
+                flashcard = flashcards[choice(list(new_cards.keys()))-1]
             else:
-                #massed grouped design
-                # if flashcards.index(flashcards[current_user.last_index]) == 14 and current_user.sequential_cycle < 7:
-                #     current_user.sequential_cycle += 1
-                #     flashcard = flashcards[0]
-                # elif flashcards.index(flashcards[current_user.last_index]) == 29 and current_user.sequential_cycle < 14 and current_user.sequential_cycle >= 7:
-                #     current_user.sequential_cycle += 1
-                #     flashcard = flashcards[14]
-                # else:
-                #     flashcard = flashcards[current_user.last_index+1]
-
-                #sequential design
-                if current_user.last_index == len(flashcards)-1:
-                    flashcard  = flashcards[0]
-                else:
-                    flashcard = flashcards[current_user.last_index+1]
+                flashcard = flashcards[index-1]
     else:
         flashcard = Flashcard.query.get_or_404(current)
 
@@ -333,9 +258,6 @@ def learn(id, current):
             seen += 1
 
     time_left = SESSION_LENGTH - current_user.total_reps/7
-    # if current_user.total_reps/7 < SESSION_LENGTH/2:
-    #     time_left -= 15
-
     time_left = round(time_left,2)
 
     if flashcard.history == '' and flashcard.pre_answer != 1:
@@ -472,6 +394,7 @@ def backend():
     user_cards = [];
     user_colours = [];
     user_memoryscores = [];
+    real_user_predictions = [];
 
     for row in c_.execute("SELECT rowid, * FROM users"):
         users[int(row[0])] = str(row[-9])
@@ -489,7 +412,8 @@ def backend():
             if scheduler == 1 and all_flashcards[i].scheduler == 1:
                 flashcards.append(all_flashcards[i])
 
-        predictions = {};                
+        predictions = {};   
+        real_predictions = {};             
 
         for i in range(len(flashcards)):
             if flashcards[i].history == '' or flashcards[i].last_time == 0:
@@ -521,10 +445,12 @@ def backend():
                     scaled_expo = math.sqrt(1.0 + expo)
                     h_power = (scaled_correct*WEIGHTS[0])+(scaled_wrong*WEIGHTS[1])+(scaled_expo*WEIGHTS[2])+WEIGHTS[3]
                     h = hclip(math.pow(2, h_power))
-                    p = pclip(math.pow(2, (-time_elapsed)/h))
+                    p = pclip(math.pow(2, (-time_elapsed)/(h*0.2)))
+                    real_p = pclip(math.pow(2, (-time_elapsed)/(h)))
 
                 #assign probability to array
                 predictions[i+1] = p
+                real_predictions[i+1] = real_p;
 
         # print(predictions);
         current_cards = {};
@@ -536,8 +462,8 @@ def backend():
             # print(row[1]);
             if row[6] == user_id:
                 if row[8] != '':
-                    current_cards[row[1]-(30*(user_id-1))] = row[4] + ' ('+row[2]+')';
-                    if predictions[row[1]-(30*(user_id-1))] > 0.9:
+                    current_cards[row[1]-(30*(user_id-1))] = row[4] + ','+row[2];
+                    if predictions[row[1]-(30*(user_id-1))] > 0.6:
                         colour[row[1]-(30*(user_id-1))] = 'green';
                     else: 
                         colour[row[1]-(30*(user_id-1))] = 'red';
@@ -549,13 +475,14 @@ def backend():
 
 
         user_predictions.append(predictions);
+        real_user_predictions.append(real_predictions);
         user_colours.append(colour);
         user_cards.append(current_cards);
         user_memoryscores.append(memory_score);
 
     # print(flashcard_generated)
 
-    return render_template('backend.html', current_cards = user_cards, predictions = user_predictions, colour=user_colours, users=users, memory_scores=user_memoryscores)
+    return render_template('backend.html', current_cards = user_cards, predictions = user_predictions, real_predictions = real_user_predictions, colour=user_colours, users=users, memory_scores=user_memoryscores)
 
 @main.route('/flashcardcollection/<int:id>/reset-cards')
 @login_required

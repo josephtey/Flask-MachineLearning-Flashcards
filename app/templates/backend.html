@@ -18,23 +18,16 @@
         <div class="panel panel-default">
           <div class="panel-heading">User-{{ user }}</div>
           <div class="panel-body">
-            <!-- <div class="col-sm-3">
-              Word
-            </div>
-            <div class="col-sm-3">
-              Chance of Remembering
-            </div>
-            <div class="col-sm-6">
-              Graph
-            </div>
-          </div>
-          <hr> -->
+
           {% for id, word in current_cards[user-1].items() %}
             <div class="row">
-              <div class="col-sm-3">
-                <strong>{{ word }}</strong>  
+              <div class="col-sm-2">
+                <strong>{{ word.split(',')[0] }}</strong>  
               </div>
-              <div class="col-sm-3">
+              <div class="col-sm-2">
+                <strong>{{ word.split(',')[1] }}</strong>  
+              </div>
+              <div class="col-sm-2">
                 {{ (predictions[user-1][id]*100) | round(2) }}%
               </div>
               <div class="col-sm-6">
@@ -46,12 +39,29 @@
             <br />
           {% endfor %}
           </div>
-          <div class="panel-footer">Current Memory State: {{ memory_scores[user-1] | round(2)}}%</div>
+          <div class="panel-footer">
+            {% set vals_1 = [(memory_scores[user-1] | round(2)) - 11.2, 0] %}
+            {% set vals_2 = [(memory_scores[user-1] | round(2)) - 22.2, 0] %}
+            <strong>Current Memory State</strong>: {{ memory_scores[user-1] | round(2)}}%</span> |
+            <strong>Vocabulary Test Tomorrow</strong>: {{ (vals | sort)[-1] }}% |
+            <strong>Vocabulary Test in 1 week</strong>: {{ (vals_2 | sort)[-1] }}%
+          </div>
         </div>
       {% endfor %}
       </div>
 
       <div class="col-sm-4">
+        <div class="panel panel-default">
+          <div class="panel-heading">Leader Board</div>
+          <div class="panel-body">
+            <ol>
+            {% for user, score in users.items() %}
+              <li><strong>User{{user}}</strong> - {{memory_scores[user-1] | round(1)}}/100</li>
+            {% endfor %}
+            </ol>
+          </div>
+          <div class="panel-footer"></div>
+        </div>
         <div class="panel panel-default">
           <div class="panel-heading">Vocabulary Words</div>
           <div class="panel-body">hello</div>
