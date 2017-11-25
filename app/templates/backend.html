@@ -1,14 +1,19 @@
-{% extends "base2.html" %}
+{% extends "base.html" %}
 
 {% block title %}backend{% endblock %}
 
 {% block page_content %}
-      <div class="jumbotron">
+      
+      <div class="row">
+      <div class="jumbotron col-sm-12" style="text-align:center; background: #333333; color: white;">
         <h1>Teacher Dashboard</h1>
       </div>
 
 
       <!-- <div id="forgetting" style="z-index:1000;height: 300px; width: 5px; background-color: black; position:absolute;right:38%;top:31%"></div> -->
+      <div class="col-sm-8 panel panel-default" style="background:#333333">
+        <!-- <br/> -->
+        <h2 style="color: white;">Students</h2>
       {% for user, score in users.items() %}
         <div class="panel panel-default">
           <div class="panel-heading">User-{{ user }}</div>
@@ -44,8 +49,18 @@
           <div class="panel-footer">Current Memory State: {{ memory_scores[user-1] | round(2)}}%</div>
         </div>
       {% endfor %}
+      </div>
 
+      <div class="col-sm-4">
+        <div class="panel panel-default">
+          <div class="panel-heading">Vocabulary Words</div>
+          <div class="panel-body">hello</div>
+          <div class="panel-footer"></div>
+        </div>
+      </div>
   
+    </div>
+      
 
     <script type="text/javascript">
  setTimeout(function(){
