@@ -27,6 +27,8 @@ SESSION_LENGTH = 30
 REP_PER_MIN = 7
 DESIGN = 2
 
+flashcard_generated = {}
+
 def loadPickle(fname):
     with open(fname, 'rb') as handle:
         item = pickle.load(handle)
@@ -220,8 +222,6 @@ def learn(id, current):
     #debug
     print('scheduler: ' + str(scheduler))
     print('total reps: ' + str(current_user.total_reps))
-
-    flashcard_generated = {}
     for i in range(len(flashcards)):
         if flashcards[i].history == '' or flashcards[i].last_time == 0:
             #print(str(i+1))
@@ -454,6 +454,108 @@ def realtime():
 
     ls = dict(zip(user_ids, values))
     return render_template('realtime.html', ls=ls)
+
+
+@main.route('/backend')
+def backend():
+    def pclip(p):
+        return min(max(p, 0.1), .9999)
+    def hclip(h):
+        return min(max(h, 1), 2000000)
+
+    sqlite_file = 'data-dev.sqlite'
+    conn_ = sqlite3.connect(sqlite_file)
+    c_ = conn_.cursor()
+    users = {};
+
+    user_predictions = [];
+    user_cards = [];
+    user_colours = [];
+    user_memoryscores = [];
+
+    for row in c_.execute("SELECT rowid, * FROM users"):
+        users[int(row[0])] = str(row[-9])
+
+    for user_id in users:
+        #important vars
+        flashcardcollection = FlashcardCollection.query.get_or_404(user_id)
+        all_flashcards = flashcardcollection.flashcards.all()
+
+        scheduler = 1
+
+        #get words for specific scheduler
+        flashcards = []
+        for i in range(len(all_flashcards)):
+            if scheduler == 1 and all_flashcards[i].scheduler == 1:
+                flashcards.append(all_flashcards[i])
+
+        predictions = {};                
+
+        for i in range(len(flashcards)):
+            if flashcards[i].history == '' or flashcards[i].last_time == 0:
+                #print(str(i+1))
+                predictions[i+1] = 0
+            else:
+                #generic features
+                history = [int(x) for x in flashcards[i].history.split(',')]
+                correct = Counter(history)[1]
+                wrong = Counter(history)[0]
+                time_elapsed = int(datetime.datetime.now().strftime('%s')) - flashcards[i].last_time
+                last_strength = flashcards[i].last_strength
+
+                #machine learning features
+                if scheduler == 1:
+                    expo = 0.0
+
+                    if (len(history) > 1):
+                        for y in range(len(history)):
+                            expo_incre = math.pow(0.8,y)
+                            if list(reversed(history))[y] == 1.0:
+                                expo += expo_incre
+                    else:
+                        expo = 0.0
+
+                    #scale the features
+                    scaled_correct = math.sqrt(1.0+correct)
+                    scaled_wrong = math.sqrt(1.0 + wrong)
+                    scaled_expo = math.sqrt(1.0 + expo)
+                    h_power = (scaled_correct*WEIGHTS[0])+(scaled_wrong*WEIGHTS[1])+(scaled_expo*WEIGHTS[2])+WEIGHTS[3]
+                    h = hclip(math.pow(2, h_power))
+                    p = pclip(math.pow(2, (-time_elapsed)/h))
+
+                #assign probability to array
+                predictions[i+1] = p
+
+        # print(predictions);
+        current_cards = {};
+        colour = {};
+
+        conn = sqlite3.connect(sqlite_file)
+        c = conn.cursor()
+        for row in c.execute("SELECT rowid, * FROM flashcard"):
+            # print(row[1]);
+            if row[6] == user_id:
+                if row[8] != '':
+                    current_cards[row[1]-(30*(user_id-1))] = row[4] + ' ('+row[2]+')';
+                    if predictions[row[1]-(30*(user_id-1))] > 0.9:
+                        colour[row[1]-(30*(user_id-1))] = 'green';
+                    else: 
+                        colour[row[1]-(30*(user_id-1))] = 'red';
+
+        # memory scores
+        memory_score = 0;
+        for i in predictions:
+            memory_score += (predictions[i])
+
+
+        user_predictions.append(predictions);
+        user_colours.append(colour);
+        user_cards.append(current_cards);
+        user_memoryscores.append(memory_score);
+
+    # print(flashcard_generated)
+
+    return render_template('backend.html', current_cards = user_cards, predictions = user_predictions, colour=user_colours, users=users, memory_scores=user_memoryscores)
 
 @main.route('/flashcardcollection/<int:id>/reset-cards')
 @login_required
