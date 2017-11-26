@@ -184,7 +184,6 @@ def learn(id, current):
     #temp vars
     total_repetitions = SESSION_LENGTH*REP_PER_MIN
     scheduler = 1
-    schedulers = [int(i) for i in current_user.scheduler_order.split(',')]
     repetitions_per_scheduler = round(total_repetitions/DESIGN)
 
     for i in range(len(flashcards)):
