@@ -377,14 +377,18 @@ def realtime():
     return render_template('realtime.html', ls=ls)
 
 
-@main.route('/backend')
-def backend():
+@main.route('/backend/<int:db>')
+def backend(db):
     def pclip(p):
         return min(max(p, 0.1), .9999)
     def hclip(h):
         return min(max(h, 1), 2000000)
 
-    sqlite_file = 'data-dev.sqlite'
+    if db == 1:
+        sqlite_file = 'classroom-data/experiment.sqlite'
+    else:
+        sqlite_file = 'data-dev.sqlite'
+
     conn_ = sqlite3.connect(sqlite_file)
     c_ = conn_.cursor()
     users = {};
@@ -394,6 +398,7 @@ def backend():
     user_colours = [];
     user_memoryscores = [];
     real_user_predictions = [];
+    cards = [];
 
     for row in c_.execute("SELECT rowid, * FROM users"):
         users[int(row[0])] = str(row[-9])
@@ -401,20 +406,16 @@ def backend():
     for user_id in users:
         #important vars
         flashcardcollection = FlashcardCollection.query.get_or_404(user_id)
-        all_flashcards = flashcardcollection.flashcards.all()
+        flashcards = flashcardcollection.flashcards.all()
 
         scheduler = 1
-
-        #get words for specific scheduler
-        flashcards = []
-        for i in range(len(all_flashcards)):
-            if scheduler == 1 and all_flashcards[i].scheduler == 1:
-                flashcards.append(all_flashcards[i])
 
         predictions = {};   
         real_predictions = {};             
 
         for i in range(len(flashcards)):
+            if user_id == 1:
+                cards.append(flashcards[i].question);
             if flashcards[i].history == '' or flashcards[i].last_time == 0:
                 #print(str(i+1))
                 predictions[i+1] = 0
@@ -451,6 +452,7 @@ def backend():
                 predictions[i+1] = p
                 real_predictions[i+1] = real_p;
 
+
         # print(predictions);
         current_cards = {};
         colour = {};
@@ -458,7 +460,7 @@ def backend():
         conn = sqlite3.connect(sqlite_file)
         c = conn.cursor()
         for row in c.execute("SELECT rowid, * FROM flashcard"):
-            # print(row[1]);
+            
             if row[6] == user_id:
                 if row[8] != '':
                     current_cards[row[1]-(30*(user_id-1))] = row[4] + ','+row[2];
@@ -481,7 +483,7 @@ def backend():
 
     # print(flashcard_generated)
 
-    return render_template('backend.html', current_cards = user_cards, predictions = user_predictions, real_predictions = real_user_predictions, colour=user_colours, users=users, memory_scores=user_memoryscores)
+    return render_template('backend.html', db=db, current_cards = user_cards, predictions = user_predictions, real_predictions = real_user_predictions, colour=user_colours, users=users, memory_scores=user_memoryscores, cards=cards)
 
 @main.route('/flashcardcollection/<int:id>/reset-cards')
 @login_required

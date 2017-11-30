@@ -19,12 +19,6 @@
           <div class="panel-heading">User-{{ user }}</div>
           <div class="panel-body">
 
-          <div class="row">
-            <div class="col-sm-8 col-sm-offset-4">
-              Chance of Remembering (Predicted by Model)
-            </div>
-          </div>
-          <hr/>
           {% for id, word in current_cards[user-1].items() %}
             <div class="row">
               <div class="col-sm-2">
@@ -46,9 +40,11 @@
           {% endfor %}
           </div>
           <div class="panel-footer">
+            {% set vals_1 = [(memory_scores[user-1] | round(2)) - 11.2, 0] %}
+            {% set vals_2 = [(memory_scores[user-1] | round(2)) - 22.2, 0] %}
             <strong>Current Memory State</strong>: {{ memory_scores[user-1] | round(2)}}%</span> |
-            <strong>Vocabulary Test Tomorrow</strong>: {{ (0.81*memory_scores[user-1]) | round(2) }}% |
-            <strong>Vocabulary Test in 1 week</strong>: {{ (0.61*memory_scores[user-1]) | round(2) }}%
+            <strong>Vocabulary Test Tomorrow</strong>: {{ (vals | sort)[-1] }}% |
+            <strong>Vocabulary Test in 1 week</strong>: {{ (vals_2 | sort)[-1] }}%
           </div>
         </div>
       {% endfor %}
@@ -66,42 +62,18 @@
           </div>
           <div class="panel-footer"></div>
         </div>
-        {% if db == 1 %}
         <div class="panel panel-default">
           <div class="panel-heading">Vocabulary Words</div>
-          <div class="panel-body">
-                <strong class="col-sm-6">
-                  Word
-                </strong>
-                <strong class="col-sm-6">
-                  Average Chance of Recall
-                </strong>
-              
-              {% for id, word in current_cards[0].items() %}
-                
-                  <div class="col-sm-6">{{ word.split(',')[0] }}</div>
-                  <div class="col-sm-6">{{ range(1, 100) | random }}%</div>
-                
-              {% endfor %}
-            </div>
-              
-            </div> 
-            
-            
-          </div>
+          <div class="panel-body">hello</div>
           <div class="panel-footer"></div>
         </div>
-        {% endif %}
       </div>
   
     </div>
       
-    {% if db != 1 %}
+
     <script type="text/javascript">
-      setTimeout(function(){
-          window.location.reload(1);
-        }, 500);
+
     </script>
-    {% endif %}
 
 {% endblock %}
