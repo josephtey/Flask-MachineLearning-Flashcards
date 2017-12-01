@@ -384,10 +384,9 @@ def backend(db):
     def hclip(h):
         return min(max(h, 1), 2000000)
 
-    if db == 1:
-        sqlite_file = 'classroom-data/experiment.sqlite'
-    else:
-        sqlite_file = 'data-dev.sqlite'
+    
+    # sqlite_file = 'classroom-data/experiment.sqlite'
+    sqlite_file = 'data-dev.sqlite'
 
     conn_ = sqlite3.connect(sqlite_file)
     c_ = conn_.cursor()
