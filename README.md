@@ -12,3 +12,7 @@ python3 manage.py runserver
 
 The website will then be available on 127.0.0.1:5000 and can be accessed by
 your browser.
+
+### Docker usage
+
+Build the image with ./build_docker.sh and run it with ./run_docker.sh
