@@ -349,7 +349,7 @@ def submit(id, set_id):
 
 @main.route('/flashcardcollection/<int:id>/<int:start>/<int:ready>/<int:set_id>/pause')
 @login_required
-def pause(id, start, ready,set_id):
+def pause(id, start, ready, set_id):
     current_user.set_num += 1
     if start:
         current_user.started = 1
